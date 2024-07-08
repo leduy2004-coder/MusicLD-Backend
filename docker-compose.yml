@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  musicLd-service:
+    container_name: musicLd-container
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+#    env_file:
+#      - local.env
+    ports:
+      - '8081:8080'
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
