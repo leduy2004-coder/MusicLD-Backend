@@ -13,4 +13,5 @@ public class ImageDataDTO extends BaseDTO {
     private String name;
     private String type;
     private byte[] imageData;
+    private UserDTO userEntity;
 }

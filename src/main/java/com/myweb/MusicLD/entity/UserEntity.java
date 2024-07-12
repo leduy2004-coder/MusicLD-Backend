@@ -30,6 +30,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "fullname")
     private String fullName;
 
+
     @Enumerated(EnumType.STRING)
     private AuthenticationType authType;
 
@@ -38,6 +39,9 @@ public class UserEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<PaymentEntity> payments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<ImageDataEntity> files = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

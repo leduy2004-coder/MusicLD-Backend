@@ -1,9 +1,7 @@
 package com.myweb.MusicLD.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -22,4 +20,8 @@ public class ImageDataEntity extends BaseEntity{
     @Column(name = "imagedata", length = 5000, columnDefinition = "VARBINARY(MAX)")
     private byte[] imageData;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 }

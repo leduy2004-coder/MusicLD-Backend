@@ -7,6 +7,7 @@ import com.myweb.MusicLD.dto.PaymentDTO;
 import com.myweb.MusicLD.entity.PaymentEntity;
 import com.myweb.MusicLD.repository.PaymentRepository;
 import com.myweb.MusicLD.service.PaymentService;
+import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,17 +34,7 @@ public class PaymentImpl implements PaymentService {
 
     @Override
     public PaymentDTO createVnPayPayment(HttpServletRequest request) {
-        String userName = "";
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-            userName = user.getUsername();
-        } else if (authentication.getPrincipal() instanceof OAuth2User) {
-            CustomOAuth2User oauth2User = (CustomOAuth2User) authentication.getPrincipal();
-            userName = oauth2User.getName();
-        }else {
-            throw new RuntimeException("User not found or not logged in");
-        }
+        String userName = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getUsername();
         long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
         String bankCode = request.getParameter("bankCode");
         Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
