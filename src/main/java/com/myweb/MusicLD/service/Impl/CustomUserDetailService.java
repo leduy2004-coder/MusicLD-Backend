@@ -1,7 +1,7 @@
 package com.myweb.MusicLD.service.Impl;
 
 import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.UserDTO;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.service.UserService;
@@ -26,7 +26,7 @@ public class CustomUserDetailService implements UserDetailsService {
     private final ModelMapper modelMapper;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDTO u = userService.findByUsername(username);
+        UserResponse u = userService.findByUsername(username);
         UserEntity user = modelMapper.map(userService.findByUsername(username), UserEntity.class);
         if (user == null) {
             throw new UsernameNotFoundException("Không tìm thấy người dùng với tên đăng nhập: " + username);

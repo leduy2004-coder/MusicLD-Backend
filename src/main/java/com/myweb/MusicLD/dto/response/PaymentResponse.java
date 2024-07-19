@@ -1,6 +1,6 @@
-package com.myweb.MusicLD.dto;
+package com.myweb.MusicLD.dto.response;
 
-import com.myweb.MusicLD.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @AllArgsConstructor
@@ -8,13 +8,14 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class PaymentDTO extends BaseDTO{
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class PaymentResponse {
         private String code;
         private String message;
         private String paymentUrl;
 
         private Long amount;
         private String bankCode;
-        private UserDTO userEntity;
+        private UserResponse userEntity;
 
 }

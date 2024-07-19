@@ -1,6 +1,8 @@
 package com.myweb.MusicLD.config.Security;
 
 import com.myweb.MusicLD.config.Oauth2.OAuthLoginSuccessHandler;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.Impl.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -36,6 +39,7 @@ public class SecurityConfig {
     private final OAuthLoginSuccessHandler oauthLoginSuccessHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -53,10 +57,17 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                )
                 .logout(logout ->
-                        logout.logoutUrl("/api/users/logout")
+                        logout.logoutUrl("/api/auth/logout")
                             .addLogoutHandler(logoutHandler)
-                            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                            .logoutSuccessHandler((request, response, authentication) ->
+                                SecurityContextHolder.clearContext()
+
+                            )
+
                 );
         return http.build();
     }

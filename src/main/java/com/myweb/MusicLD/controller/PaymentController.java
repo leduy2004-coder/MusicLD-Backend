@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.controller;
 
-import com.myweb.MusicLD.dto.PaymentDTO;
+import com.myweb.MusicLD.dto.request.PaymentRequest;
+import com.myweb.MusicLD.dto.response.PaymentResponse;
 import com.myweb.MusicLD.response.ResponseObject;
 import com.myweb.MusicLD.service.PaymentService;
 import com.myweb.MusicLD.service.UserService;
@@ -19,24 +20,24 @@ public class PaymentController {
     private final PaymentService paymentService;
     private final UserService userService;
     @GetMapping("/vn-pay")
-    public ResponseObject<PaymentDTO> pay(HttpServletRequest request) {
+    public ResponseObject<PaymentResponse> pay(HttpServletRequest request) {
         return new ResponseObject<>(HttpStatus.OK, "Success", paymentService.createVnPayPayment(request));
     }
     @GetMapping("/vn-pay-callback")
-    public ResponseObject<PaymentDTO> payCallbackHandler(HttpServletRequest request,
+    public ResponseObject<PaymentResponse> payCallbackHandler(HttpServletRequest request,
                                                          @RequestParam(value = "vnp_ResponseCode") String code,
                                                          @RequestParam(value = "vnp_Amount") String amount,
                                                          @RequestParam(value = "vnp_BankCode") String bankCode,
                                                          @RequestParam(value = "userName") String userName
     ) {
         if (code.equals("00")) {
-            PaymentDTO paymentDTO = paymentService.save(PaymentDTO.builder()
+            PaymentResponse paymentDTO = paymentService.save(PaymentRequest.builder()
                     .amount(Long.parseLong(amount))
                     .code(code)
                     .bankCode(bankCode)
                     .userEntity(userService.findByUsername(userName))
                     .build());
-            return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentDTO("00", "Success", "",Long.parseLong(amount),bankCode,null));
+            return new ResponseObject<>(HttpStatus.OK, "Success", new PaymentResponse("00", "Success", "",Long.parseLong(amount),bankCode,null));
         } else {
             return new ResponseObject<>(HttpStatus.BAD_REQUEST, "Failed", null);
         }

@@ -1,12 +1,9 @@
 package com.myweb.MusicLD.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.myweb.MusicLD.utility.TokenType;
 import jakarta.persistence.*;
 import lombok.*;
-
-
 
 @Builder
 @Getter
@@ -15,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "token")
-public class TokenEntity extends BaseEntity{
+public class TokenEntity extends BaseEntity {
 
     @Column(unique = true)
     private String token;
@@ -27,8 +24,8 @@ public class TokenEntity extends BaseEntity{
 
     private boolean expired;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private UserEntity userEntity;
 }

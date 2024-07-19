@@ -1,8 +1,10 @@
 package com.myweb.MusicLD.config.Oauth2;
 
 import com.myweb.MusicLD.dto.CustomOAuth2User;
-import com.myweb.MusicLD.dto.TokenDTO;
-import com.myweb.MusicLD.dto.UserDTO;
+import com.myweb.MusicLD.dto.request.TokenRequest;
+import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.TokenResponse;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.TokenEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.service.TokenService;
@@ -39,11 +41,11 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
         String accessToken = oauth2User.getAccessToken();
         try {
-            UserDTO existingUser = userService.findByUsername(oauth2User.getUser().getUsername());
+            UserResponse existingUser = userService.findByUsername(oauth2User.getUser().getUsername());
             if (existingUser!=null) {
                 revokeAllUserTokens(modelMapper.map(existingUser,UserEntity.class));
             } else {
-                UserDTO userDTO = userService.insert(modelMapper.map(oauth2User.getUser(), UserDTO.class));
+                UserResponse userDTO = userService.insert(modelMapper.map(oauth2User.getUser(), UserRequest.class));
                 oauth2User = new CustomOAuth2User(modelMapper.map(userDTO, UserEntity.class), oauth2User.getOauth2User(), oauth2User.getOauth2ClientName(), oauth2User.getAuthorities(), accessToken);
             }
             updateSecurityContext(oauth2User, clientRegistrationId);
@@ -70,16 +72,16 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
                 .expired(false)
                 .revoked(false)
                 .build();
-        tokenService.save(modelMapper.map(token,TokenDTO.class));
+        tokenService.save(modelMapper.map(token, TokenRequest.class));
     }
     private void revokeAllUserTokens(UserEntity user) {
-        List<TokenDTO> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
+        List<TokenResponse> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
-            tokenService.save(token);
+            tokenService.save(modelMapper.map(token,TokenRequest.class));
         });
 
     }

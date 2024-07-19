@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.controller.Auth;
+package com.myweb.MusicLD.dto.request;
 import lombok.*;
 
 @Data

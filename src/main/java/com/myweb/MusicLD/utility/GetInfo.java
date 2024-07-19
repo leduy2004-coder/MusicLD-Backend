@@ -2,7 +2,7 @@ package com.myweb.MusicLD.utility;
 
 import com.myweb.MusicLD.dto.CustomOAuth2User;
 import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.UserDTO;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +14,7 @@ public class GetInfo {
         return new ModelMapper();
     }
 
-    public static UserDTO getLoggedInUserInfo() {
+    public static UserResponse getLoggedInUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() ||
                 authentication instanceof AnonymousAuthenticationToken) {
@@ -22,10 +22,10 @@ public class GetInfo {
         }
         ModelMapper mapper = getMapper();
         if (authentication.getPrincipal() instanceof CustomUserDetails userPrincipal) {
-            return mapper.map(userPrincipal.getUser(), UserDTO.class);
+            return mapper.map(userPrincipal.getUser(), UserResponse.class);
         } else if (authentication.getPrincipal() instanceof OAuth2User) {
             CustomOAuth2User oauth2User = (CustomOAuth2User) authentication.getPrincipal();
-            return mapper.map(oauth2User.getUser(), UserDTO.class);
+            return mapper.map(oauth2User.getUser(), UserResponse.class);
         }
         return null;
     }

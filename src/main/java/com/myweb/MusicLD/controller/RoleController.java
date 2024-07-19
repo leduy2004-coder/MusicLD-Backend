@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.controller;
 
-import com.myweb.MusicLD.dto.RoleDTO;
+import com.myweb.MusicLD.dto.request.RoleRequest;
+import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.service.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,8 +18,8 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    public ResponseEntity<RoleDTO> insert(@RequestBody RoleDTO roleDto){
-        RoleDTO insert = roleService.insert(roleDto);
+    public ResponseEntity<RoleResponse> insert(@RequestBody RoleRequest roleDto){
+        RoleResponse insert = roleService.insert(roleDto);
         return new ResponseEntity<>(insert, HttpStatus.CREATED);
     }
 

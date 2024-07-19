@@ -1,9 +1,8 @@
 package com.myweb.MusicLD.service.Impl;
 
 import com.myweb.MusicLD.config.Payment.VNPAYConfig;
-import com.myweb.MusicLD.dto.CustomOAuth2User;
-import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.PaymentDTO;
+import com.myweb.MusicLD.dto.request.PaymentRequest;
+import com.myweb.MusicLD.dto.response.PaymentResponse;
 import com.myweb.MusicLD.entity.PaymentEntity;
 import com.myweb.MusicLD.repository.PaymentRepository;
 import com.myweb.MusicLD.service.PaymentService;
@@ -13,9 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -33,7 +29,7 @@ public class PaymentImpl implements PaymentService {
     private final ModelMapper modelMapper;
 
     @Override
-    public PaymentDTO createVnPayPayment(HttpServletRequest request) {
+    public PaymentResponse createVnPayPayment(HttpServletRequest request) {
         String userName = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getUsername();
         long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
         String bankCode = request.getParameter("bankCode");
@@ -50,15 +46,15 @@ public class PaymentImpl implements PaymentService {
         String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
         queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
         String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
-        return PaymentDTO.builder()
+        return PaymentResponse.builder()
                 .code("ok")
                 .message("success")
                 .paymentUrl(paymentUrl).build();
     }
 
     @Override
-    public PaymentDTO save(PaymentDTO payment) {
-        return modelMapper.map(repository.save(modelMapper.map(payment, PaymentEntity.class)), PaymentDTO.class);
+    public PaymentResponse save(PaymentRequest payment) {
+        return modelMapper.map(repository.save(modelMapper.map(payment, PaymentEntity.class)), PaymentResponse.class);
     }
 
 

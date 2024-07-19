@@ -1,13 +1,14 @@
 package com.myweb.MusicLD.entity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.myweb.MusicLD.utility.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 
 @Getter
 @Setter
@@ -30,25 +31,30 @@ public class UserEntity extends BaseEntity {
     @Column(name = "fullname")
     private String fullName;
 
+    @Column(name = "dateofbirth")
+    private Date dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     private AuthenticationType authType;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<TokenEntity> tokens = new ArrayList<>();
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<TokenEntity> tokens;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<PaymentEntity> payments = new ArrayList<>();
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<PaymentEntity> payments;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<ImageDataEntity> files = new ArrayList<>();
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<ImageDataEntity> files;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @JsonIgnore
-    private List<RoleEntity> roles = new ArrayList<>();
+    private List<RoleEntity> roles;
 }

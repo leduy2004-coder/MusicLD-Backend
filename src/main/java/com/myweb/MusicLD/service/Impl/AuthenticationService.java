@@ -1,13 +1,16 @@
-package com.myweb.MusicLD.controller.Auth;
+package com.myweb.MusicLD.service.Impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.TokenDTO;
-import com.myweb.MusicLD.dto.UserDTO;
-import com.myweb.MusicLD.entity.TokenEntity;
+import com.myweb.MusicLD.dto.request.AuthenticationRequest;
+import com.myweb.MusicLD.dto.request.TokenRequest;
+import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.AuthenticationResponse;
+import com.myweb.MusicLD.dto.response.TokenResponse;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.service.Impl.CustomUserDetailService;
-import com.myweb.MusicLD.service.Impl.JwtService;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.TokenService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.TokenType;
@@ -34,16 +37,18 @@ public class AuthenticationService {
     private final ModelMapper modelMapper;
 
 
-    public AuthenticationResponse register(UserDTO userDto) {
+    public AuthenticationResponse register(UserRequest request) {
         UserEntity userSaver = new UserEntity();
         try {
             customUserDetails = new CustomUserDetails();
-             userSaver =modelMapper.map(userService.insert(userDto), UserEntity.class);
+            UserResponse userResponse = userService.insert(request);
+             userSaver =modelMapper.map(userResponse, UserEntity.class);
             customUserDetails.setUser(userSaver);
             var jwtToken = jwtService.generateToken(customUserDetails);
             var refreshToken = jwtService.generateRefreshToken(customUserDetails);
             saveUserToken(userSaver, jwtToken);
             return AuthenticationResponse.builder()
+                    .userResponse(userResponse)
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
                     .build();
@@ -57,6 +62,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var jwtToken = "";
         var refreshToken = "";
+        UserResponse userDTO = new UserResponse();
         try {
              authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -65,7 +71,9 @@ public class AuthenticationService {
                     )
             );
             customUserDetails = new CustomUserDetails();
-            UserEntity user = modelMapper.map(userService.findByUsername(request.getUsername()), UserEntity.class);
+            userDTO = userService.findByUsername(request.getUsername());
+            UserEntity user = modelMapper.map(userDTO, UserEntity.class);
+
             customUserDetails.setUser(user);
             jwtToken = jwtService.generateToken(customUserDetails);
             refreshToken = jwtService.generateRefreshToken(customUserDetails);
@@ -73,34 +81,35 @@ public class AuthenticationService {
             saveUserToken(user, jwtToken);
 
         }catch (Exception e) {
-            e.printStackTrace();
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .userResponse(userDTO)
                 .build();
     }
     private void revokeAllUserTokens(UserEntity user) {
-        List<TokenDTO> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
+        List<TokenResponse> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
-            tokenService.save(token);
+            tokenService.save(modelMapper.map(token, TokenRequest.class));
         });
 
     }
 
     public void saveUserToken(UserEntity user, String jwtToken) {
-        var token = TokenEntity.builder()
-                .userEntity(user)
+        TokenRequest token = TokenRequest.builder()
+                .userEntity(modelMapper.map(user,UserResponse.class))
                 .token(jwtToken)
                 .tokenType(TokenType.BEARER)
                 .expired(false)
                 .revoked(false)
                 .build();
-        tokenService.save(modelMapper.map(token,TokenDTO.class));
+        tokenService.save(token);
     }
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {

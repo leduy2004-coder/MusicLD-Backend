@@ -1,8 +1,10 @@
 package com.myweb.MusicLD.service.Impl;
 
-import com.myweb.MusicLD.dto.RoleDTO;
+import com.myweb.MusicLD.dto.request.RoleRequest;
+import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
-import com.myweb.MusicLD.exception.ResourceNotFoundException;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.RoleRepository;
 import com.myweb.MusicLD.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +18,15 @@ public class RoleImpl implements RoleService {
     private final ModelMapper modelMapper;
 
     @Override
-    public RoleDTO insert(RoleDTO roleDto) {
-        return modelMapper.map(repository.save(modelMapper.map(roleDto, RoleEntity.class)), RoleDTO.class);
+    public RoleResponse insert(RoleRequest roleDto) {
+        return modelMapper.map(repository.save(modelMapper.map(roleDto, RoleEntity.class)), RoleResponse.class);
     }
 
     @Override
-    public RoleDTO findById(Long id) {
-        RoleEntity role = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee is not exists with given id : "+ id));
-        return modelMapper.map(role,RoleDTO.class);
+    public RoleResponse findByCode(String code) {
+        RoleEntity role = repository.findByCode(code)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return modelMapper.map(role,RoleResponse.class);
     }
 
 }

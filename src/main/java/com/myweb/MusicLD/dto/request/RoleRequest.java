@@ -1,6 +1,5 @@
-package com.myweb.MusicLD.dto;
+package com.myweb.MusicLD.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,8 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ImageDataDTO {
+public class RoleRequest {
+    private String code;
     private String name;
-    private String type;
-    private byte[] imageData;
 }

@@ -1,10 +1,13 @@
 package com.myweb.MusicLD.service.Impl;
 
-import com.myweb.MusicLD.dto.TokenDTO;
+import com.myweb.MusicLD.dto.response.TokenResponse;
+import com.myweb.MusicLD.entity.TokenEntity;
+import com.myweb.MusicLD.repository.TokenRepository;
 import com.myweb.MusicLD.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LogoutImpl implements LogoutHandler {
 
+    private final TokenRepository tokenRepository;
+    private final ModelMapper modelMapper;
     private final TokenService tokenService;
 
     @Override
@@ -28,12 +33,12 @@ public class LogoutImpl implements LogoutHandler {
             return;
         }
         jwt = authHeader.substring(7);
-        TokenDTO storedToken = tokenService.findByToken(jwt);
+        TokenResponse storedToken = tokenService.findByToken(jwt);
 
         if (storedToken.getId() != null) {
             storedToken.setExpired(true);
             storedToken.setRevoked(true);
-            tokenService.save(storedToken);
+            tokenRepository.save(modelMapper.map(storedToken, TokenEntity.class));
             SecurityContextHolder.clearContext();
         }
     }

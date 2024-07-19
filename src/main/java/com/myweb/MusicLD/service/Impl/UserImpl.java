@@ -2,9 +2,12 @@ package com.myweb.MusicLD.service.Impl;
 
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.UserDTO;
+import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
@@ -30,33 +33,34 @@ public class UserImpl implements UserService {
     private CustomUserDetails customUserDetails;
 
     @Override
-    public UserDTO insert(UserDTO userDto) {
-        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+    public UserResponse insert(UserRequest userDto) {
 
-        if (userDto.getRoles() != null && !userDto.getRoles().isEmpty()) {
-            List<RoleEntity> roles = new ArrayList<>();
-            roles = userDto.getRoles().stream().map(role -> modelMapper.map(roleService.findById(role.getId()), RoleEntity.class)).collect(Collectors.toList());
-            userEntity.setRoles(roles);
-        }
-        if (userDto.getAuthType().equals("LOCAL"))
-            userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        UserEntity savedUserEntity = userRepository.save(userEntity);
+            UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
 
-        return modelMapper.map(savedUserEntity, UserDTO.class);
+            if (userDto.getRoles() != null && !userDto.getRoles().isEmpty()) {
+                List<RoleEntity> roles = new ArrayList<>();
+                roles = userDto.getRoles().stream().map(role -> modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class)).collect(Collectors.toList());
+                userEntity.setRoles(roles);
+            }
+            if (userDto.getAuthType().name().equalsIgnoreCase("LOCAL"))
+                userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+            UserEntity savedUserEntity = userRepository.save(userEntity);
+            return modelMapper.map(savedUserEntity, UserResponse.class);
+
     }
 
     @Override
-    public UserDTO findById(Long id) {
-        return modelMapper.map(userRepository.findById(id),UserDTO.class);
+    public UserResponse findById(Long id) {
+        return modelMapper.map(userRepository.findById(id),UserResponse.class);
     }
 
     @Override
-    public UserDTO findByUsername(String userName) {
-        UserEntity userEntity = userRepository.findByUsername(userName).orElse(null);
+    public UserResponse findByUsername(String userName) {
+        UserEntity userEntity = userRepository.findByUsername(userName).orElseThrow(() ->  new AppException(ErrorCode.USER_NOT_EXISTED));
         if (userEntity == null) {
             return null;
         }
-        return modelMapper.map(userEntity, UserDTO.class);
+        return modelMapper.map(userEntity, UserResponse.class);
     }
 
     @Override
@@ -73,9 +77,9 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> findAll() {
+    public List<UserResponse> findAll() {
         List<UserEntity> list = userRepository.findAll();
-        return list.stream().map(UserEntity -> modelMapper.map(UserEntity,UserDTO.class)).collect(Collectors.toList());
+        return list.stream().map(UserEntity -> modelMapper.map(UserEntity,UserResponse.class)).collect(Collectors.toList());
     }
 
     @Override

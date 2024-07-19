@@ -1,9 +1,12 @@
 package com.myweb.MusicLD.controller.Auth;
 
+import com.myweb.MusicLD.dto.request.AuthenticationRequest;
+import com.myweb.MusicLD.dto.response.ApiResponse;
+import com.myweb.MusicLD.dto.response.AuthenticationResponse;
+import com.myweb.MusicLD.service.Impl.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +23,10 @@ public class AuthenticationController {
 
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ApiResponse<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(service.authenticate(request));
+        return ApiResponse.<AuthenticationResponse>builder().result(service.authenticate(request)).build();
     }
 
     @PostMapping("/refresh-token")

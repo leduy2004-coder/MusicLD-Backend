@@ -1,8 +1,9 @@
 package com.myweb.MusicLD.service;
 
-import com.myweb.MusicLD.dto.RoleDTO;
+import com.myweb.MusicLD.dto.request.RoleRequest;
+import com.myweb.MusicLD.dto.response.RoleResponse;
 
 public interface RoleService {
-    RoleDTO insert(RoleDTO roleDto);
-    RoleDTO findById(Long id);
+    RoleResponse insert(RoleRequest roleDto);
+    RoleResponse findByCode(String code);
 }
