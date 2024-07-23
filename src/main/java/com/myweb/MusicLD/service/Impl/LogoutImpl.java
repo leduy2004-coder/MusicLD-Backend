@@ -1,9 +1,14 @@
 package com.myweb.MusicLD.service.Impl;
 
+import com.myweb.MusicLD.dto.request.TokenRequest;
+import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.TokenResponse;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.TokenEntity;
+import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.TokenRepository;
 import com.myweb.MusicLD.service.TokenService;
+import com.myweb.MusicLD.utility.GetInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +39,6 @@ public class LogoutImpl implements LogoutHandler {
         }
         jwt = authHeader.substring(7);
         TokenResponse storedToken = tokenService.findByToken(jwt);
-
         if (storedToken.getId() != null) {
             storedToken.setExpired(true);
             storedToken.setRevoked(true);

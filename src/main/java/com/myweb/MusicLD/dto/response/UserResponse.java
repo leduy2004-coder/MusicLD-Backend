@@ -23,4 +23,5 @@ public class UserResponse{
     private List<RoleResponse> roles;
     private List<TokenResponse> tokens;
     private AuthenticationType authType;
+
 }

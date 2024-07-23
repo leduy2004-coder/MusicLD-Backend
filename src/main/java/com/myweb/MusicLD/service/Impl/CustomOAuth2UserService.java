@@ -68,7 +68,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String provider = clientName.equals("Google") ? AuthenticationType.GOOGLE.name() : AuthenticationType.FACEBOOK.name();
         List<RoleEntity> roles = new ArrayList<>();
         RoleEntity role = new RoleEntity();
-        role.setId(2L);
+        role.setCode("USER");
         roles.add(role);
         return UserEntity.builder()
                 .authType(AuthenticationType.valueOf(provider))

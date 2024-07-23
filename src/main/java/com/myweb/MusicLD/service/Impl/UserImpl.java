@@ -9,6 +9,7 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.AuthenticationType;
@@ -33,34 +34,44 @@ public class UserImpl implements UserService {
     private CustomUserDetails customUserDetails;
 
     @Override
-    public UserResponse insert(UserRequest userDto) {
+    public UserResponse insert(UserRequest userRequest) {
 
-            UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+            UserEntity userEntity = modelMapper.map(userRequest, UserEntity.class);
 
-            if (userDto.getRoles() != null && !userDto.getRoles().isEmpty()) {
+            if (userRequest.getRoles() != null && !userRequest.getRoles().isEmpty()) {
                 List<RoleEntity> roles = new ArrayList<>();
-                roles = userDto.getRoles().stream().map(role -> modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class)).collect(Collectors.toList());
+                roles = userRequest.getRoles().stream()
+                        .map(role ->
+                                modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class))
+                        .collect(Collectors.toList());
                 userEntity.setRoles(roles);
             }
-            if (userDto.getAuthType().name().equalsIgnoreCase("LOCAL"))
+
+            if (userRequest.getAuthType().name().equalsIgnoreCase("LOCAL"))
                 userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
             UserEntity savedUserEntity = userRepository.save(userEntity);
             return modelMapper.map(savedUserEntity, UserResponse.class);
-
     }
 
     @Override
     public UserResponse findById(Long id) {
-        return modelMapper.map(userRepository.findById(id),UserResponse.class);
+        UserEntity user = userRepository.findById(id)
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse findByUsername(String userName) {
-        UserEntity userEntity = userRepository.findByUsername(userName).orElseThrow(() ->  new AppException(ErrorCode.USER_NOT_EXISTED));
-        if (userEntity == null) {
+        UserEntity user = userRepository.findByUsername(userName)
+                .orElse(null);
+        if (user == null) {
             return null;
         }
-        return modelMapper.map(userEntity, UserResponse.class);
+        return modelMapper.map(user, UserResponse.class);
     }
 
     @Override

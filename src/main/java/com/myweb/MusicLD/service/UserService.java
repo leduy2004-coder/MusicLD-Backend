@@ -12,7 +12,7 @@ public interface UserService {
 
     UserResponse findById(Long id);
     UserResponse findByUsername(String userName);
-    public void changePassword(ChangePassword request, Principal connectedUser);
-    public List<UserResponse> findAll();
-    public void updateAuthenticationType(String username, String oauth2ClientName);
+    void changePassword(ChangePassword request, Principal connectedUser);
+    List<UserResponse> findAll();
+    void updateAuthenticationType(String username, String oauth2ClientName);
 }

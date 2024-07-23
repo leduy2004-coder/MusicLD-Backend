@@ -32,6 +32,7 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     private final UserService userService;
     private final ModelMapper modelMapper;
     private final TokenService tokenService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
@@ -45,19 +46,18 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
             if (existingUser!=null) {
                 revokeAllUserTokens(modelMapper.map(existingUser,UserEntity.class));
             } else {
-                UserResponse userDTO = userService.insert(modelMapper.map(oauth2User.getUser(), UserRequest.class));
-                oauth2User = new CustomOAuth2User(modelMapper.map(userDTO, UserEntity.class), oauth2User.getOauth2User(), oauth2User.getOauth2ClientName(), oauth2User.getAuthorities(), accessToken);
+                existingUser = userService.insert(modelMapper.map(oauth2User.getUser(), UserRequest.class));
             }
+            oauth2User = new CustomOAuth2User(modelMapper.map(existingUser, UserEntity.class), oauth2User.getOauth2User(), oauth2User.getOauth2ClientName(), oauth2User.getAuthorities(), accessToken);
             updateSecurityContext(oauth2User, clientRegistrationId);
             saveUserToken(oauth2User.getUser(),accessToken);
-            this.setAlwaysUseDefaultTargetUrl(true);
-//        this.setDefaultTargetUrl("/default-url"); // Đặt URL mặc định của bạn ở đây
-            super.onAuthenticationSuccess(request, response, authentication);
+            response.sendRedirect("http://localhost:3000/oauth2/callback?id="+oauth2User.getUser().getId());
         } catch (EntityNotFoundException ex) {
             ex.printStackTrace();
             throw new RuntimeException("Error handling user authentication", ex);
-        }
+        }  
     }
+
 
     private void updateSecurityContext(CustomOAuth2User oauth2User, String clientRegistrationId) {
         Authentication securityAuth = new OAuth2AuthenticationToken(oauth2User, oauth2User.getAuthorities(), clientRegistrationId);

@@ -32,6 +32,7 @@ spring:
               - email
               - profile
 
+
           facebook:
             client-id: ${FACEBOOK_CLIENT_ID}
             client-secret: ${FACEBOOK_CLIENT_SECRET}

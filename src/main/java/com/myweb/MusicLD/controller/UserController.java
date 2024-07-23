@@ -1,16 +1,15 @@
 package com.myweb.MusicLD.controller;
 
 
+import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.Impl.AuthenticationService;
-import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.service.Impl.LogoutImpl;
 import com.myweb.MusicLD.service.UserService;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +47,14 @@ public class UserController {
         return ResponseEntity.ok("Change password ok");
     }
 
+    @PostMapping("/get-user")
+    public ApiResponse<AuthenticationResponse> getUser (@RequestBody UserRequest user) {
+        UserResponse userResponse = userService.findById(user.getId());
+        AuthenticationResponse result = AuthenticationResponse.builder()
+                .accessToken(userResponse.getTokens().getLast().getToken())
+                .userResponse(userResponse)
+                .build();
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    }
 
 }

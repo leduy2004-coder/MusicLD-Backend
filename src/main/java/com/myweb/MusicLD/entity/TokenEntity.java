@@ -14,7 +14,7 @@ import lombok.*;
 @Table(name = "token")
 public class TokenEntity extends BaseEntity {
 
-    @Column(unique = true)
+    @Column(unique = true, length = 5000, columnDefinition = "VARCHAR(555)")
     private String token;
 
     @Enumerated(EnumType.STRING)

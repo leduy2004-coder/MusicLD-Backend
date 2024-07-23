@@ -1,6 +1,8 @@
 package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.utility.TokenType;
 import lombok.*;
 
@@ -16,5 +18,5 @@ public class TokenResponse {
     private TokenType tokenType;
     private boolean revoked;
     private boolean expired;
-
+    private UserRequest userEntity;
 }
