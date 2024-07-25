@@ -19,4 +19,5 @@ public class AuthenticationResponse {
     private String refreshToken;
 
     private UserResponse userResponse;
+    private String avatar;
 }

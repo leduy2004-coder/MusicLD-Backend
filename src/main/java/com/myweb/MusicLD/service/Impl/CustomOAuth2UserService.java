@@ -72,7 +72,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         roles.add(role);
         return UserEntity.builder()
                 .authType(AuthenticationType.valueOf(provider))
-                .fullName(oauth2User.getAttribute("name"))
+                .nickName(oauth2User.getAttribute("name"))
                 .status(true)
                 .username(oauth2User.getAttribute("email"))
                 .roles(roles)

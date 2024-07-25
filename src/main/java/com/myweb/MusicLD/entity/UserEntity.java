@@ -1,12 +1,10 @@
 package com.myweb.MusicLD.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.myweb.MusicLD.utility.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +26,8 @@ public class UserEntity extends BaseEntity {
     @Column(name = "status")
     private Boolean status;
 
-    @Column(name = "fullname")
-    private String fullName;
+    @Column(name = "nickname")
+    private String nickName;
 
     @Column(name = "dateofbirth")
     private Date dateOfBirth;
@@ -37,17 +35,17 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AuthenticationType authType;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<TokenEntity> tokens;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PaymentEntity> payments;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<ImageDataEntity> files;
+    private List<AvatarEntity> avatars;
 
 
     @ManyToMany(fetch = FetchType.LAZY)

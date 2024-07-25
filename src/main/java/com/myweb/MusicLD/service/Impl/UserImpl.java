@@ -6,10 +6,7 @@ import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.exception.AppException;
-import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.AuthenticationType;
@@ -18,9 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +36,7 @@ public class UserImpl implements UserService {
             UserEntity userEntity = modelMapper.map(userRequest, UserEntity.class);
 
             if (userRequest.getRoles() != null && !userRequest.getRoles().isEmpty()) {
-                List<RoleEntity> roles = new ArrayList<>();
-                roles = userRequest.getRoles().stream()
+                List<RoleEntity> roles = userRequest.getRoles().stream()
                         .map(role ->
                                 modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class))
                         .collect(Collectors.toList());
@@ -97,6 +93,14 @@ public class UserImpl implements UserService {
     public void updateAuthenticationType(String username, String oauth2ClientName) {
         AuthenticationType authType = AuthenticationType.valueOf(oauth2ClientName.toUpperCase());
         userRepository.updateAuthenticationType(username, authType);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> searchUsers(String searchString) {
+        return userRepository.searchUsers(searchString).stream()
+                .map(userEntity -> modelMapper.map(userEntity, UserResponse.class))
+                .toList();
     }
 
 }

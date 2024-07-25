@@ -1,8 +1,6 @@
 package com.myweb.MusicLD.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,15 +10,18 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "ImageData")
-public class ImageDataEntity extends BaseEntity{
+@Table(name = "avatar")
+public class AvatarEntity extends BaseEntity{
     private String name;
 
     private String type;
 
     @Lob
     @Column(name = "imagedata", length = 5000, columnDefinition = "VARBINARY(MAX)")
-    private byte[] imageData;
+    private byte[] avatarData;
+
+    @Column(name = "status")
+    private Boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

@@ -61,8 +61,8 @@ public class CustomUserDetails implements UserDetails {
         return user.getStatus();
     }
 
-    public String getFullName() {
-        return user.getFullName();
+    public String getNickName() {
+        return user.getNickName();
     }
 
 

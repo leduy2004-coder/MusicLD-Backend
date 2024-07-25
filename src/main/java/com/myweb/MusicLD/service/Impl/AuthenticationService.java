@@ -11,6 +11,7 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
+import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.TokenType;
@@ -31,6 +32,7 @@ import java.util.List;
 public class AuthenticationService {
     private final JwtService jwtService;
     private final UserService userService;
+    private final AvatarService avatarService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
     private CustomUserDetails customUserDetails;
@@ -51,6 +53,7 @@ public class AuthenticationService {
                     .userResponse(userResponse)
                     .accessToken(jwtToken)
                     .refreshToken(refreshToken)
+                    .avatar(avatarService.findByStatus(true).getName())
                     .build();
         }catch (Exception e) {
             System.out.println(userSaver);
@@ -87,6 +90,7 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .userResponse(userDTO)
+                .avatar(avatarService.findByStatus(true).getName())
                 .build();
     }
     private void revokeAllUserTokens(UserEntity user) {
@@ -132,6 +136,7 @@ public class AuthenticationService {
                 var authResponse = AuthenticationResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
+                        .avatar(avatarService.findByStatus(true).getName())
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }

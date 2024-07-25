@@ -7,7 +7,6 @@ import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.Impl.AuthenticationService;
-import com.myweb.MusicLD.service.Impl.LogoutImpl;
 import com.myweb.MusicLD.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final AuthenticationService service;
-    private final LogoutImpl logout;
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
@@ -31,11 +29,16 @@ public class UserController {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
     }
 
+    @GetMapping("/search")
+    public ApiResponse<List<UserResponse>> searchUser(@RequestParam(value = "q") String result){
+        List<UserResponse> list = userService.searchUsers(result);
+        return ApiResponse.<List<UserResponse>>builder().result(list).build();
+    }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> findAll(){
+    @GetMapping("/get-all")
+    public ApiResponse<List<UserResponse>> findAll(){
         List<UserResponse> list = userService.findAll();
-        return ResponseEntity.ok(list);
+        return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 
     @PatchMapping

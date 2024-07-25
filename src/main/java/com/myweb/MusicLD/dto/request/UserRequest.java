@@ -18,7 +18,7 @@ public class UserRequest {
     private String username;
     private String password;
     private Boolean status = true;
-    private String fullName;
+    private String nickName;
     private Date dateOfBirth;
     private AuthenticationType authType;
     private List<RoleRequest> roles;

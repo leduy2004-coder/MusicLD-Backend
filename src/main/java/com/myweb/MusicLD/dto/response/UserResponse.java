@@ -19,7 +19,7 @@ public class UserResponse{
     private String username;
     private String password;
     private Boolean status;
-    private String fullName;
+    private String nickName;
     private List<RoleResponse> roles;
     private List<TokenResponse> tokens;
     private AuthenticationType authType;
