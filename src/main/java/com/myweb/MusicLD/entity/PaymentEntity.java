@@ -1,8 +1,6 @@
 package com.myweb.MusicLD.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,11 +12,11 @@ import lombok.*;
 @Entity
 @Table(name = "payment")
 public class PaymentEntity extends BaseEntity{
-    @Column
+
     private String code;
-    @Column
+
     private Long amount;
-    @Column
+
     private String bankCode;
 
     @ManyToOne(fetch = FetchType.LAZY)

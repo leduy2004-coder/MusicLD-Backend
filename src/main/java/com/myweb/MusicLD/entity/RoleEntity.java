@@ -1,12 +1,11 @@
 package com.myweb.MusicLD.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,9 +18,8 @@ import java.util.List;
 @Table(name = "role")
 public class RoleEntity extends BaseEntity{
 
-    @Column
     private String code;
-    @Column
+
     private String name;
 
 
