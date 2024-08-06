@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +54,7 @@ public class PaymentImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentResponse save(PaymentRequest payment) {
         return modelMapper.map(repository.save(modelMapper.map(payment, PaymentEntity.class)), PaymentResponse.class);
     }

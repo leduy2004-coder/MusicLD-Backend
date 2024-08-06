@@ -7,6 +7,10 @@ import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.AuthenticationType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -35,6 +39,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User user =  super.loadUser(userRequest);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("USER"));
+        String avatarUrl = (String) user.getAttributes().get("picture");
         return new CustomOAuth2User(convertToUserEntity(user,clientName), user, clientName,authorities,userRequest.getAccessToken().getTokenValue());
     }
     public CustomOAuth2User loadUserByToken(String token, String provider) {
@@ -43,10 +48,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (provider.equals("google")) {
             userInfoEndpointUri = "https://www.googleapis.com/oauth2/v3/userinfo";
         } else if (provider.equals("facebook")) {
-            userInfoEndpointUri = "https://graph.facebook.com/me?fields=id,name,email";
+            userInfoEndpointUri = "https://graph.facebook.com/me?fields=id,name,email,picture";
         }
         if (!userInfoEndpointUri.isEmpty()) {
-            Map<String, Object> userAttributes = restTemplate.getForObject(userInfoEndpointUri + "?access_token=" + token, Map.class);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(token);
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+            var response = restTemplate.exchange(
+                        userInfoEndpointUri, HttpMethod.GET, entity, Map.class);
+
+            var userAttributes = response.getBody();
+
             if (userAttributes != null) {
                 UserEntity user = modelMapper.map(userService.findByUsername((String) userAttributes.get("email")), UserEntity.class);
                 List<SimpleGrantedAuthority> authorities = new ArrayList<>();

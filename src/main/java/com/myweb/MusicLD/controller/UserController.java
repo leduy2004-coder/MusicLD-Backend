@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
@@ -25,7 +26,7 @@ public class UserController {
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
             @RequestBody UserRequest request
-    ) {
+    ) throws JsonProcessingException {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
     }
 
@@ -54,7 +55,7 @@ public class UserController {
     public ApiResponse<AuthenticationResponse> getUser (@RequestBody UserRequest user) {
         UserResponse userResponse = userService.findById(user.getId());
         AuthenticationResponse result = AuthenticationResponse.builder()
-                .accessToken(userResponse.getTokens().getLast().getToken())
+//                .accessToken(userResponse.getTokens().getLast().getToken())
                 .userResponse(userResponse)
                 .build();
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();

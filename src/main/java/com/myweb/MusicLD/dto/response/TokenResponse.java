@@ -14,9 +14,8 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokenResponse {
     private Long id;
-    private String token;
+    private String refreshToken;
     private TokenType tokenType;
     private boolean revoked;
     private boolean expired;
-    private UserRequest userEntity;
 }

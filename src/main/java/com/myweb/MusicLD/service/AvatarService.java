@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AvatarService {
-     String uploadImage(MultipartFile file);
+     AvatarResponse uploadImage(MultipartFile file);
      byte[] downloadImage(String fileName);
      AvatarResponse findByStatus(Boolean status);
 }

@@ -1,14 +1,7 @@
 package com.myweb.MusicLD.service.Impl;
 
-import com.myweb.MusicLD.dto.request.TokenRequest;
-import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.dto.response.TokenResponse;
-import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.entity.TokenEntity;
-import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.repository.TokenRepository;
-import com.myweb.MusicLD.service.TokenService;
-import com.myweb.MusicLD.utility.GetInfo;
+import com.myweb.MusicLD.service.TokenRedisService;
+import com.myweb.MusicLD.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +15,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LogoutImpl implements LogoutHandler {
 
-    private final TokenRepository tokenRepository;
-    private final ModelMapper modelMapper;
-    private final TokenService tokenService;
+    private final TokenRedisService tokenRedisService;
+    private final JwtService jwtService;
 
     @Override
     public void logout(
@@ -34,16 +26,13 @@ public class LogoutImpl implements LogoutHandler {
     ) {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
+        final String userName;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
         jwt = authHeader.substring(7);
-        TokenResponse storedToken = tokenService.findByToken(jwt);
-        if (storedToken.getId() != null) {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(modelMapper.map(storedToken, TokenEntity.class));
-            SecurityContextHolder.clearContext();
-        }
+        userName = jwtService.extractUserName(jwt);
+        tokenRedisService.clearByUserName(userName);
+        SecurityContextHolder.clearContext();
     }
 }

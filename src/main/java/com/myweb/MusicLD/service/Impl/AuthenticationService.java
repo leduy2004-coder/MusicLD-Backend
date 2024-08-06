@@ -1,20 +1,20 @@
 package com.myweb.MusicLD.service.Impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
-import com.myweb.MusicLD.dto.request.TokenRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
-import com.myweb.MusicLD.dto.response.TokenResponse;
+import com.myweb.MusicLD.dto.response.AvatarResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.AvatarService;
-import com.myweb.MusicLD.service.TokenService;
+import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
-import com.myweb.MusicLD.utility.TokenType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,32 +33,24 @@ public class AuthenticationService {
     private final UserService userService;
     private final AvatarService avatarService;
     private final AuthenticationManager authenticationManager;
-    private final TokenService tokenService;
-    private CustomUserDetails customUserDetails;
+    private CustomUserDetails customUserDetails= new CustomUserDetails();;
     private final ModelMapper modelMapper;
+    private final TokenRedisService tokenRedisService;
 
 
-    public AuthenticationResponse register(UserRequest request) {
-        UserEntity userSaver = new UserEntity();
-        try {
-            customUserDetails = new CustomUserDetails();
-            UserResponse userResponse = userService.insert(request);
-             userSaver =modelMapper.map(userResponse, UserEntity.class);
-            customUserDetails.setUser(userSaver);
-            var jwtToken = jwtService.generateToken(customUserDetails);
-            var refreshToken = jwtService.generateRefreshToken(customUserDetails);
-            saveUserToken(userSaver, jwtToken);
-            return AuthenticationResponse.builder()
-                    .userResponse(userResponse)
-                    .accessToken(jwtToken)
-                    .refreshToken(refreshToken)
-                    .avatar(avatarService.findByStatus(true).getName())
-                    .build();
-        }catch (Exception e) {
-            System.out.println(userSaver);
-            e.printStackTrace();
-        }
-        return null;
+    public AuthenticationResponse register(UserRequest request) throws JsonProcessingException {
+        UserResponse userResponse = userService.insert(request);
+        UserEntity userSaver = modelMapper.map(userResponse, UserEntity.class);
+        customUserDetails.setUser(userSaver);
+        var jwtToken = jwtService.generateToken(customUserDetails);
+        var refreshToken = jwtService.generateRefreshToken(customUserDetails);
+        tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
+        String nameAvatar = getAvatar();
+        return AuthenticationResponse.builder()
+                .userResponse(userResponse)
+                .accessToken(jwtToken)
+                .avatar(nameAvatar)
+                .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -67,7 +58,7 @@ public class AuthenticationService {
         var refreshToken = "";
         UserResponse userDTO = new UserResponse();
         try {
-             authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
                             request.getPassword()
@@ -80,67 +71,48 @@ public class AuthenticationService {
             customUserDetails.setUser(user);
             jwtToken = jwtService.generateToken(customUserDetails);
             refreshToken = jwtService.generateRefreshToken(customUserDetails);
-            revokeAllUserTokens(user);
-            saveUserToken(user, jwtToken);
+            tokenRedisService.saveRefreshToken(user.getUsername(), refreshToken);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
-                .refreshToken(refreshToken)
                 .userResponse(userDTO)
                 .avatar(avatarService.findByStatus(true).getName())
                 .build();
     }
-    private void revokeAllUserTokens(UserEntity user) {
-        List<TokenResponse> validUserTokens = tokenService.findAllValidTokenByUser(user.getId());
-        if (validUserTokens.isEmpty())
-            return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
-            tokenService.save(modelMapper.map(token, TokenRequest.class));
-        });
 
+    private String getAvatar(){
+        AvatarResponse avatarResponse = avatarService.findByStatus(true);
+        if (avatarResponse != null)
+            return avatarResponse.getName();
+        return null;
     }
-
-    public void saveUserToken(UserEntity user, String jwtToken) {
-        TokenRequest token = TokenRequest.builder()
-                .userEntity(modelMapper.map(user,UserResponse.class))
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
-        tokenService.save(token);
-    }
-
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String refreshToken;
+        final String accessToken;
         final String userName;
-        if (authHeader == null ||!authHeader.startsWith("Bearer")) {
-            return;
-        }
-        refreshToken = authHeader.substring(7);
-        userName = jwtService.extractUserName(refreshToken);
+        if (authHeader == null || !authHeader.startsWith("Bearer"))
+            throw new AppException(ErrorCode.TOKEN_INVALID);
+        accessToken = authHeader.substring(7);
+        userName = jwtService.extractUserName(accessToken);
         if (userName != null) {
             customUserDetails = new CustomUserDetails();
-            UserEntity user =  modelMapper.map(userService.findByUsername(userName),UserEntity.class);
+            UserEntity user = modelMapper.map(userService.findByUsername(userName), UserEntity.class);
             customUserDetails.setUser(user);
-            if (jwtService.isTokenValid(refreshToken, customUserDetails)) {
-                var accessToken = jwtService.generateToken(customUserDetails);
-                revokeAllUserTokens(user);
-                saveUserToken(user, accessToken);
-                var authResponse = AuthenticationResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .avatar(avatarService.findByStatus(true).getName())
-                        .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
-            }
-        }
-    }
 
+            String refreshToken = tokenRedisService.getRefreshToken(userName);
+            if (refreshToken == null) throw new AppException(ErrorCode.RE_TOKEN_EXPIRED);
+            String newAccessToken = jwtService.generateToken(customUserDetails);
+            String newRefreshToken = jwtService.generateRefreshToken(customUserDetails);
+            tokenRedisService.saveRefreshToken(user.getUsername(), newRefreshToken);
+            String nameAvatar = getAvatar();
+            return AuthenticationResponse.builder()
+                    .accessToken(newAccessToken)
+                    .avatar(nameAvatar)
+                    .build();
+        }
+        return null;
+    }
 }

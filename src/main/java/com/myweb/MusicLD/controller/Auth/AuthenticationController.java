@@ -30,11 +30,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public void refreshToken(
+    public ApiResponse<AuthenticationResponse> refreshToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
-        service.refreshToken(request, response);
+        return ApiResponse.<AuthenticationResponse>builder().result(service.refreshToken(request, response)).build();
     }
 
 

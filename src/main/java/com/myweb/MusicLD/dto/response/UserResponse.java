@@ -21,7 +21,6 @@ public class UserResponse{
     private Boolean status;
     private String nickName;
     private List<RoleResponse> roles;
-    private List<TokenResponse> tokens;
     private AuthenticationType authType;
 
 }

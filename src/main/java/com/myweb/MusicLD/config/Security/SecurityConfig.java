@@ -1,8 +1,6 @@
 package com.myweb.MusicLD.config.Security;
 
 import com.myweb.MusicLD.config.Oauth2.OAuthLoginSuccessHandler;
-import com.myweb.MusicLD.exception.AppException;
-import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.Impl.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -65,9 +62,7 @@ public class SecurityConfig {
                             .addLogoutHandler(logoutHandler)
                             .logoutSuccessHandler((request, response, authentication) ->
                                 SecurityContextHolder.clearContext()
-
                             )
-
                 );
         return http.build();
     }

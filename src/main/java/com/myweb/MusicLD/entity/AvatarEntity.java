@@ -17,8 +17,8 @@ public class AvatarEntity extends BaseEntity{
     private String type;
 
     @Lob
-    @Column(name = "imagedata", length = 5000, columnDefinition = "VARBINARY(MAX)")
-    private byte[] avatarData;
+    @Column(name = "data", columnDefinition = "VARBINARY(MAX)")
+    private byte[] data;
 
     @Column(name = "status")
     private Boolean status;

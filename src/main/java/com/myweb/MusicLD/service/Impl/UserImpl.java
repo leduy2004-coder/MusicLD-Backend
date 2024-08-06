@@ -6,6 +6,8 @@ import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
@@ -32,21 +34,23 @@ public class UserImpl implements UserService {
 
     @Override
     public UserResponse insert(UserRequest userRequest) {
+        if (userRepository.findByUsername(userRequest.getUsername()).isPresent())
+            throw new AppException(ErrorCode.USER_EXISTED);
 
-            UserEntity userEntity = modelMapper.map(userRequest, UserEntity.class);
+        UserEntity userEntity = modelMapper.map(userRequest, UserEntity.class);
 
-            if (userRequest.getRoles() != null && !userRequest.getRoles().isEmpty()) {
-                List<RoleEntity> roles = userRequest.getRoles().stream()
-                        .map(role ->
-                                modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class))
-                        .collect(Collectors.toList());
-                userEntity.setRoles(roles);
-            }
+        if (userRequest.getRoles() != null && !userRequest.getRoles().isEmpty()) {
+            List<RoleEntity> roles = userRequest.getRoles().stream()
+                    .map(role ->
+                            modelMapper.map(roleService.findByCode(role.getCode()), RoleEntity.class))
+                    .collect(Collectors.toList());
+            userEntity.setRoles(roles);
+        }
 
-            if (userRequest.getAuthType().name().equalsIgnoreCase("LOCAL"))
-                userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-            UserEntity savedUserEntity = userRepository.save(userEntity);
-            return modelMapper.map(savedUserEntity, UserResponse.class);
+        if (userRequest.getAuthType().name().equalsIgnoreCase("LOCAL"))
+            userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        return modelMapper.map(savedUserEntity, UserResponse.class);
     }
 
     @Override
@@ -71,6 +75,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void changePassword(ChangePassword request, Principal connectedUser) {
         customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
         if (!passwordEncoder.matches(request.getCurrentPassword(), customUserDetails.getPassword())) {
@@ -90,6 +95,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateAuthenticationType(String username, String oauth2ClientName) {
         AuthenticationType authType = AuthenticationType.valueOf(oauth2ClientName.toUpperCase());
         userRepository.updateAuthenticationType(username, authType);

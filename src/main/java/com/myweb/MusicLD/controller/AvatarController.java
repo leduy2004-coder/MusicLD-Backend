@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.controller;
 
 import com.myweb.MusicLD.dto.response.ApiResponse;
+import com.myweb.MusicLD.dto.response.AvatarResponse;
 import com.myweb.MusicLD.service.AvatarService;
 import lombok.AllArgsConstructor;
 
@@ -19,9 +20,9 @@ public class AvatarController {
 
     private final AvatarService avatarService;
     @PostMapping
-    public ApiResponse<?> uploadImage(@RequestParam("image")MultipartFile file) throws IOException {
-        String uploadImage = avatarService.uploadImage(file);
-        return ApiResponse.builder().result(uploadImage).build();
+    public ApiResponse<AvatarResponse> uploadImage(@RequestParam("image")MultipartFile file) {
+        AvatarResponse avatarResponse = avatarService.uploadImage(file);
+        return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
     }
 
     @GetMapping("/{fileName}")

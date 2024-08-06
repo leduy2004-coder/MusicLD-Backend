@@ -1,7 +1,8 @@
 package com.myweb.MusicLD.config.Security;
 
 import com.myweb.MusicLD.dto.CustomOAuth2User;
-import com.myweb.MusicLD.repository.TokenRepository;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.Impl.CustomOAuth2UserService;
 import com.myweb.MusicLD.service.Impl.CustomUserDetailService;
 import com.myweb.MusicLD.service.Impl.JwtService;
@@ -25,7 +26,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailService userDetailsService;
-    private final TokenRepository tokenRepository;
     private final CustomOAuth2UserService oAuth2UserService;
     @Override
     protected void doFilterInternal(
@@ -63,10 +63,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userName = jwtService.extractUserName(jwt);
             if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails =  this.userDetailsService.loadUserByUsername(userName);
-                var isTokenValid = tokenRepository.findByToken(jwt)
-                        .map(t -> !t.isExpired() && !t.isRevoked())
-                        .orElse(false);
-                if (jwtService.isTokenValid(jwt,userDetails) && isTokenValid){
+
+                if (jwtService.isTokenValid(jwt,userDetails)){
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -86,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String extractProviderFromToken(String token) {
         if (token.startsWith("ya29")) {
             return "google";
-        } else if (token.startsWith("EAAG")) {
+        } else if (token.startsWith("EAA")) {
             return "facebook";
         }
         return null;

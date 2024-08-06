@@ -10,7 +10,9 @@ import com.myweb.MusicLD.utility.ImageUtils;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +26,8 @@ public class AvatarImpl implements AvatarService {
     private final ModelMapper mapper;
 
     @Override
-    public String uploadImage(MultipartFile file) {
+    @Transactional
+    public AvatarResponse uploadImage(MultipartFile file) {
         try {
             List<AvatarEntity> activeAvatars = avatarRepository.findByStatus(true);
             if(!activeAvatars.isEmpty()) {
@@ -37,11 +40,18 @@ public class AvatarImpl implements AvatarService {
             AvatarEntity imageData = avatarRepository.save(AvatarEntity.builder()
                     .name(file.getOriginalFilename())
                     .type(file.getContentType())
-                    .avatarData(ImageUtils.compressImage(file.getBytes()))
+                    .data(ImageUtils.compressImage(file.getBytes()))
                     .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(),UserEntity.class))
                     .status(true)
                     .build());
-            return file.getOriginalFilename();
+            String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/avatars/")
+                    .path(imageData.getName())
+                    .toUriString();
+            return AvatarResponse.builder()
+                    .url(imageUrl)
+                    .name(file.getOriginalFilename())
+                    .build();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,13 +60,14 @@ public class AvatarImpl implements AvatarService {
     @Override
     public byte[] downloadImage(String fileName) {
         Optional<AvatarEntity> dbImageData =  avatarRepository.findByName(fileName);
-        return ImageUtils.decompressImage(dbImageData.get().getAvatarData());
+        return ImageUtils.decompressImage(dbImageData.get().getData());
     }
 
     @Override
     public AvatarResponse findByStatus(Boolean status) {
-        return mapper.map(avatarRepository.findByStatus(status).getLast(), AvatarResponse.class);
+        List<AvatarEntity> avatarEntity = avatarRepository.findByStatus(status);
+        if (avatarEntity.isEmpty()) return null;
+        return mapper.map(avatarEntity.getLast(), AvatarResponse.class);
     }
-
 
 }

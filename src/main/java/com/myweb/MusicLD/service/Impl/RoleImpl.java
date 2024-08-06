@@ -10,6 +10,7 @@ import com.myweb.MusicLD.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class RoleImpl implements RoleService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public RoleResponse insert(RoleRequest roleDto) {
         return modelMapper.map(repository.save(modelMapper.map(roleDto, RoleEntity.class)), RoleResponse.class);
     }
