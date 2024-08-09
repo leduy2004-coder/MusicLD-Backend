@@ -1,11 +1,9 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.service.TokenRedisService;
-import com.myweb.MusicLD.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;

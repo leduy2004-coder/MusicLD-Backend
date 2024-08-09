@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.request.RoleRequest;
 import com.myweb.MusicLD.dto.response.RoleResponse;

@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,14 +18,14 @@ import java.util.Optional;
 public class JpaAuditingConfig {
 
     @Bean
-    public AuditorAware<Long> auditorProvider() {
+    public AuditorAware<BigInteger> auditorProvider() {
         return new AuditorAwareImpl();
     }
 
-    public static class AuditorAwareImpl implements AuditorAware<Long> {
+    public static class AuditorAwareImpl implements AuditorAware<BigInteger> {
 
         @Override
-        public Optional<Long> getCurrentAuditor() {
+        public Optional<BigInteger> getCurrentAuditor() {
             try {
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 if (authentication == null || !authentication.isAuthenticated() ||

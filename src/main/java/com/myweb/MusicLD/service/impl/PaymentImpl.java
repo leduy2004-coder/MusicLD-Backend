@@ -1,6 +1,6 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
-import com.myweb.MusicLD.config.Payment.VNPAYConfig;
+import com.myweb.MusicLD.config.payment.VNPAYConfig;
 import com.myweb.MusicLD.dto.request.PaymentRequest;
 import com.myweb.MusicLD.dto.response.PaymentResponse;
 import com.myweb.MusicLD.entity.PaymentEntity;

@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.security;
 
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.response.UserResponse;

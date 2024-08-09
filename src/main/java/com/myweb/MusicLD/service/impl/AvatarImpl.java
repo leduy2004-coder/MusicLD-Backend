@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.response.AvatarResponse;
 import com.myweb.MusicLD.entity.AvatarEntity;
@@ -17,7 +17,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

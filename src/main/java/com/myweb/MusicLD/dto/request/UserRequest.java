@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myweb.MusicLD.utility.AuthenticationType;
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserRequest {
-    private Long id;
+    private BigInteger id;
     private String username;
     private String password;
     @Builder.Default

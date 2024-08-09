@@ -6,13 +6,14 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 
 public interface UserService {
     UserResponse insert(UserRequest userDto);
 
-    UserResponse findById(Long id);
+    UserResponse findById(BigInteger id);
     UserResponse findByUsername(String userName);
     void changePassword(ChangePassword request, Principal connectedUser);
     List<UserResponse> findAll();

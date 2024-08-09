@@ -12,7 +12,7 @@ import java.util.Collection;
 @Setter
 @Getter
 @Data
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails{
     private UserEntity user;
     private Collection<? extends GrantedAuthority> authorities;
 

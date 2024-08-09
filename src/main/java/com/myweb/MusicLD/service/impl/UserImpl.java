@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.CustomUserDetails;
@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public UserResponse findById(Long id) {
+    public UserResponse findById(BigInteger id) {
         UserEntity user = userRepository.findById(id)
                 .orElse(null);
         if (user == null) {

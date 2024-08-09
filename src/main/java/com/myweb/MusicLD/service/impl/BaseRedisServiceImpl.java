@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.service.BaseRedisService;
 import lombok.RequiredArgsConstructor;

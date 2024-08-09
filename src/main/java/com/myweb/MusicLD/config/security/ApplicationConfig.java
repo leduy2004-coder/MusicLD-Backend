@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.config.Security;
+package com.myweb.MusicLD.config.security;
 
 import com.myweb.MusicLD.config.JpaAuditingConfig;
 import com.myweb.MusicLD.dto.CustomUserDetails;
@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.math.BigInteger;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,7 +42,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public AuditorAware<Long> auditorAware() {
+    public AuditorAware<BigInteger> auditorAware() {
         return new JpaAuditingConfig.AuditorAwareImpl();
     }
 

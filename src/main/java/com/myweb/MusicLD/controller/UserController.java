@@ -1,14 +1,14 @@
 package com.myweb.MusicLD.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.service.Impl.AuthenticationService;
+import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
+import com.myweb.MusicLD.service.security.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +22,12 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final AuthenticationService service;
+    private final TokenRedisService tokenRedisService;
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
             @RequestBody UserRequest request
-    ) throws JsonProcessingException {
+    )  {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
     }
 
@@ -55,7 +56,7 @@ public class UserController {
     public ApiResponse<AuthenticationResponse> getUser (@RequestBody UserRequest user) {
         UserResponse userResponse = userService.findById(user.getId());
         AuthenticationResponse result = AuthenticationResponse.builder()
-//                .accessToken(userResponse.getTokens().getLast().getToken())
+                .accessToken(tokenRedisService.getRefreshToken(userResponse.getUsername()))
                 .userResponse(userResponse)
                 .build();
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();

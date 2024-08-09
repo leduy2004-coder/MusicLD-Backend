@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.config.Security;
+package com.myweb.MusicLD.config.security;
 
 import java.io.IOException;
 

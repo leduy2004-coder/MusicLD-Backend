@@ -1,11 +1,7 @@
-package com.myweb.MusicLD.config.Security;
+package com.myweb.MusicLD.config.security;
 
-import com.myweb.MusicLD.dto.CustomOAuth2User;
-import com.myweb.MusicLD.exception.AppException;
-import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.service.Impl.CustomOAuth2UserService;
-import com.myweb.MusicLD.service.Impl.CustomUserDetailService;
-import com.myweb.MusicLD.service.Impl.JwtService;
+import com.myweb.MusicLD.service.impl.JwtService;
+import com.myweb.MusicLD.service.security.CustomUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +22,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailService userDetailsService;
-    private final CustomOAuth2UserService oAuth2UserService;
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -37,29 +32,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
             final String userName;
-            final String provider;
 
             if (authHeader == null || !authHeader.startsWith("Bearer")){
                 filterChain.doFilter(request,response);
                 return;
             }
             jwt = authHeader.substring(7);
-
-            provider = extractProviderFromToken(jwt);
-            if (provider != null) {
-                CustomOAuth2User oAuth2User = oAuth2UserService.loadUserByToken(jwt, provider);
-                if (oAuth2User != null) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            oAuth2User, provider, oAuth2User.getAuthorities());
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-            }
-
             userName = jwtService.extractUserName(jwt);
             if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails =  this.userDetailsService.loadUserByUsername(userName);
@@ -80,13 +58,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-    private String extractProviderFromToken(String token) {
-        if (token.startsWith("ya29")) {
-            return "google";
-        } else if (token.startsWith("EAA")) {
-            return "facebook";
-        }
-        return null;
     }
 }

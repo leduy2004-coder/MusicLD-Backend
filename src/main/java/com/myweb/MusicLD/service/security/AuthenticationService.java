@@ -1,11 +1,9 @@
-package com.myweb.MusicLD.service.Impl;
+package com.myweb.MusicLD.service.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.AvatarResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
@@ -15,6 +13,7 @@ import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
+import com.myweb.MusicLD.service.impl.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class AuthenticationService {
     private final TokenRedisService tokenRedisService;
 
 
-    public AuthenticationResponse register(UserRequest request) throws JsonProcessingException {
+    public AuthenticationResponse register(UserRequest request)  {
         UserResponse userResponse = userService.insert(request);
         UserEntity userSaver = modelMapper.map(userResponse, UserEntity.class);
         customUserDetails.setUser(userSaver);

@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.config.Payment;
+package com.myweb.MusicLD.config.payment;
 
 import com.myweb.MusicLD.utility.VNPayUtil;
 import lombok.Getter;
