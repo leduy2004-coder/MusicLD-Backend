@@ -24,6 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserResponse u = userService.findByUsername(username);

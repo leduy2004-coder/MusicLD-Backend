@@ -1,15 +1,17 @@
 package com.myweb.MusicLD.service.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
+import com.myweb.MusicLD.dto.request.ExchangeTokenRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.dto.response.AuthenticationResponse;
-import com.myweb.MusicLD.dto.response.AvatarResponse;
-import com.myweb.MusicLD.dto.response.UserResponse;
+import com.myweb.MusicLD.dto.response.*;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
+import com.myweb.MusicLD.repository.feignClient.FacebookIdentityClient;
+import com.myweb.MusicLD.repository.feignClient.FacebookUserInfoClient;
+import com.myweb.MusicLD.repository.feignClient.GoogleIdentityClient;
+import com.myweb.MusicLD.repository.feignClient.GoogleUserInfoClient;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
@@ -17,13 +19,17 @@ import com.myweb.MusicLD.service.impl.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +38,13 @@ public class AuthenticationService {
     private final UserService userService;
     private final AvatarService avatarService;
     private final AuthenticationManager authenticationManager;
-    private CustomUserDetails customUserDetails= new CustomUserDetails();;
+    private CustomUserDetails customUserDetails = new CustomUserDetails();
+
     private final ModelMapper modelMapper;
     private final TokenRedisService tokenRedisService;
 
 
-    public AuthenticationResponse register(UserRequest request)  {
+    public AuthenticationResponse register(UserRequest request) {
         UserResponse userResponse = userService.insert(request);
         UserEntity userSaver = modelMapper.map(userResponse, UserEntity.class);
         customUserDetails.setUser(userSaver);
@@ -82,12 +89,13 @@ public class AuthenticationService {
                 .build();
     }
 
-    private String getAvatar(){
+    private String getAvatar() {
         AvatarResponse avatarResponse = avatarService.findByStatus(true);
         if (avatarResponse != null)
             return avatarResponse.getName();
         return null;
     }
+
     public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String accessToken;

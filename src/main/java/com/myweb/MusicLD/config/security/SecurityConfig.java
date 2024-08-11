@@ -1,7 +1,6 @@
 package com.myweb.MusicLD.config.security;
 
-import com.myweb.MusicLD.config.oauth2.OAuthLoginSuccessHandler;
-import com.myweb.MusicLD.service.oauth2.OAuth2UserService;
+import com.myweb.MusicLD.service.security.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,8 +42,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
-    private final OAuthLoginSuccessHandler oauthLoginSuccessHandler;
-    private final OAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,11 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/management/**").hasAuthority("ADMIN")
                         .anyRequest()
                         .authenticated())
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(oauthLoginSuccessHandler)
-                )
+                .oauth2Login(withDefaults())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 )

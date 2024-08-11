@@ -1,18 +1,14 @@
 package com.myweb.MusicLD.controller.auth;
 
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
-import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
-import com.myweb.MusicLD.service.oauth2.OAuth2UserService;
+import com.myweb.MusicLD.service.security.OAuth2UserService;
 import com.myweb.MusicLD.service.security.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -41,9 +37,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/oauth2")
-    public ApiResponse<AuthenticationResponse> handleOAuth2Callback(@RequestBody UserRequest user) {
-        AuthenticationResponse authenticationResponse = oAuth2UserService.loginOauth2(user);
-        return ApiResponse.<AuthenticationResponse>builder().result(authenticationResponse).build();
+    ApiResponse<AuthenticationResponse> outboundAuthenticate(
+            @RequestParam("code") String code,
+            @RequestParam("provider") String provider
+    ){
+        var result = oAuth2UserService.getUserInfo(provider,code);
+        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
+
 
 }
