@@ -2,16 +2,13 @@ package com.myweb.MusicLD.service.security;
 
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
-import com.myweb.MusicLD.dto.request.ExchangeTokenRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.dto.response.*;
+import com.myweb.MusicLD.dto.response.AuthenticationResponse;
+import com.myweb.MusicLD.dto.response.AvatarResponse;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.repository.feignClient.FacebookIdentityClient;
-import com.myweb.MusicLD.repository.feignClient.FacebookUserInfoClient;
-import com.myweb.MusicLD.repository.feignClient.GoogleIdentityClient;
-import com.myweb.MusicLD.repository.feignClient.GoogleUserInfoClient;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
@@ -19,17 +16,13 @@ import com.myweb.MusicLD.service.impl.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +44,11 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(customUserDetails);
         var refreshToken = jwtService.generateRefreshToken(customUserDetails);
         tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
-        String nameAvatar = getAvatar();
+
         return AuthenticationResponse.builder()
                 .userResponse(userResponse)
                 .accessToken(jwtToken)
-                .avatar(nameAvatar)
+                .avatar(avatarService.findByStatus(userResponse.getId(),true))
                 .build();
     }
 
@@ -63,6 +56,7 @@ public class AuthenticationService {
         var jwtToken = "";
         var refreshToken = "";
         UserResponse userDTO = new UserResponse();
+        AvatarResponse avatarResponse;
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -85,15 +79,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .userResponse(userDTO)
-                .avatar(avatarService.findByStatus(true).getName())
+                .avatar(avatarService.findByStatus(userDTO.getId(),true))
                 .build();
-    }
-
-    private String getAvatar() {
-        AvatarResponse avatarResponse = avatarService.findByStatus(true);
-        if (avatarResponse != null)
-            return avatarResponse.getName();
-        return null;
     }
 
     public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -114,10 +101,10 @@ public class AuthenticationService {
             String newAccessToken = jwtService.generateToken(customUserDetails);
             String newRefreshToken = jwtService.generateRefreshToken(customUserDetails);
             tokenRedisService.saveRefreshToken(user.getUsername(), newRefreshToken);
-            String nameAvatar = getAvatar();
+
             return AuthenticationResponse.builder()
                     .accessToken(newAccessToken)
-                    .avatar(nameAvatar)
+                    .avatar(avatarService.findByStatus(user.getId(),true))
                     .build();
         }
         return null;

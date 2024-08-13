@@ -1,41 +1,49 @@
 package com.myweb.MusicLD.utility;
 
-import java.io.ByteArrayOutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
-public class ImageUtils {
-    public static byte[] compressImage(byte[] data) {
-        Deflater deflater = new Deflater();
-        deflater.setLevel(Deflater.BEST_COMPRESSION);
-        deflater.setInput(data);
-        deflater.finish();
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        byte[] tmp = new byte[4*1024];
-        while (!deflater.finished()) {
-            int size = deflater.deflate(tmp);
-            outputStream.write(tmp, 0, size);
-        }
-        try {
-            outputStream.close();
-        } catch (Exception ignored) {
-        }
-        return outputStream.toByteArray();
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ImageUtils {
+    public static final long MAX_FILE_SIZE = 2 * 1024 * 1024 * 2;
+
+    public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
+
+    public static final String DATE_FORMAT = "yyyyMMddHHmmss";
+
+    public static final String FILE_NAME_FORMAT = "%s_%s";
+
+    public static boolean isAllowedExtension(final String fileName, final String pattern) {
+        final Matcher matcher = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE).matcher(fileName);
+        return matcher.matches();
     }
 
-    public static byte[] decompressImage(byte[] data) {
-        Inflater inflater = new Inflater();
-        inflater.setInput(data);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
-        byte[] tmp = new byte[4*1024];
-        try {
-            while (!inflater.finished()) {
-                int count = inflater.inflate(tmp);
-                outputStream.write(tmp, 0, count);
-            }
-            outputStream.close();
-        } catch (Exception ignored) {
+    public static void assertAllowed(MultipartFile file, String pattern) {
+        final long size = file.getSize();
+        if (size > MAX_FILE_SIZE) {
+            throw new AppException(ErrorCode.FILE_TOO_LARGE);
         }
-        return outputStream.toByteArray();
+
+        final String fileName = file.getOriginalFilename();
+        final String extension = FilenameUtils.getExtension(fileName);
+        if (!isAllowedExtension(fileName, pattern)) {
+            throw new AppException(ErrorCode.INVALID_FILE_EXTENSION);
+        }
+    }
+
+    public static String getFileName(final String name) {
+        final DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        final String date = dateFormat.format(System.currentTimeMillis());
+        return String.format(FILE_NAME_FORMAT, name, date);
     }
 }

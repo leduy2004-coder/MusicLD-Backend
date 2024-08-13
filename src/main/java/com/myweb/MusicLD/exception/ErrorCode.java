@@ -20,7 +20,9 @@ public enum ErrorCode {
     TOKEN_INVALID(1009, "Invalid token ", HttpStatus.BAD_REQUEST),
     RE_TOKEN_EXPIRED(1010, "Expired refresh token", HttpStatus.BAD_REQUEST),
     TOKEN_EXPIRED(1011, "Expired refresh token", HttpStatus.BAD_REQUEST),
-
+    UPLOAD_FAILED(1012, "Failed to upload file", HttpStatus.BAD_REQUEST),
+    FILE_TOO_LARGE(1013, "File size exceeds the limit of 2MB", HttpStatus.BAD_REQUEST), // 400
+    INVALID_FILE_EXTENSION(1014, "Invalid file extension. Allowed extensions are jpg, png, gif, bmp", HttpStatus.BAD_REQUEST), // 400
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

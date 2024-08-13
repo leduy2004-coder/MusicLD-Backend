@@ -2,27 +2,29 @@ package com.myweb.MusicLD.service.security;
 
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.dto.response.AuthenticationResponse;
-import com.myweb.MusicLD.dto.response.ExchangeTokenResponse;
-import com.myweb.MusicLD.dto.response.Oauth2UserResponse;
-import com.myweb.MusicLD.dto.response.UserResponse;
+import com.myweb.MusicLD.dto.response.*;
+import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
+import com.myweb.MusicLD.repository.AvatarRepository;
 import com.myweb.MusicLD.repository.UserRepository;
 import com.myweb.MusicLD.repository.feignClient.FacebookIdentityClient;
 import com.myweb.MusicLD.repository.feignClient.FacebookUserInfoClient;
 import com.myweb.MusicLD.repository.feignClient.GoogleIdentityClient;
 import com.myweb.MusicLD.repository.feignClient.GoogleUserInfoClient;
+import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
 import com.myweb.MusicLD.utility.AuthenticationType;
+import com.myweb.MusicLD.utility.GetInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +36,8 @@ public class OAuth2UserService {
     private final ModelMapper modelMapper;
     private final UserService userService;
     private final JwtService jwtService;
+    private final AvatarService avatarService;
+    private final AvatarRepository avatarRepository;
     private final TokenRedisService tokenRedisService;
     private final UserRepository userRepository;
     private final GoogleIdentityClient googleIdentityClient;
@@ -66,6 +70,7 @@ public class OAuth2UserService {
     protected String REDIRECT_URI_GOOGLE_CLIENT;
     @NonFinal
     protected final String GRANT_TYPE = "authorization_code";
+    String urlAvatar = null;
 
     public AuthenticationResponse getUserInfo(String provider, String code) {
         Oauth2UserResponse oauth2UserResponse = new Oauth2UserResponse();
@@ -138,13 +143,16 @@ public class OAuth2UserService {
 
         String id = null;
         String username = null;
+
         if (userInfo instanceof Oauth2UserResponse.GoogleUserInfo googleUserInfo) {
             id = googleUserInfo.getId();
             username = googleUserInfo.getName();
+            urlAvatar = googleUserInfo.getPicture();
         } else {
             Oauth2UserResponse.FacebookUserInfo facebookUserInfo = (Oauth2UserResponse.FacebookUserInfo) userInfo;
             id = facebookUserInfo.getId();
             username = facebookUserInfo.getName();
+            urlAvatar = facebookUserInfo.getPicture().getData().getUrl();
         }
 
         return UserEntity.builder()
@@ -164,9 +172,16 @@ public class OAuth2UserService {
         assert user != null;
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        avatarRepository.save(AvatarEntity.builder()
+                .url(urlAvatar)
+                .userEntity(user)
+                .status(true)
+                .build());
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
+                .avatar(avatarService.findByStatus(user.getId(), true))
                 .userResponse(userResponse)
                 .build();
     }
+
 }

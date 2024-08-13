@@ -16,11 +16,11 @@ public class AvatarEntity extends BaseEntity{
 
     private String type;
 
-    @Lob
-    @Column(name = "data", columnDefinition = "VARBINARY(MAX)")
-    private byte[] data;
+    @Column(name = "url", length = 2048)
+    private String url;
 
-    @Column(name = "status")
+    private String publicId;
+
     private Boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)

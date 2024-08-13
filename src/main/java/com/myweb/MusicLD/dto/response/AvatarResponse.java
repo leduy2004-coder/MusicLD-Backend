@@ -10,6 +10,6 @@ import lombok.*;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AvatarResponse {
-    private String name;
+    private String publicId;
     private String url;
 }

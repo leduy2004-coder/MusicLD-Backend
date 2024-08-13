@@ -6,6 +6,8 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.utility.TokenType;
 import lombok.*;
 
+import java.math.BigInteger;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.*;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokenResponse {
-    private Long id;
+    private BigInteger id;
     private String refreshToken;
     private TokenType tokenType;
     private boolean revoked;
