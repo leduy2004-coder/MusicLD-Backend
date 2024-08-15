@@ -9,6 +9,7 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
+import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.AuthenticationType;
@@ -31,10 +32,10 @@ public class UserImpl implements UserService {
     private final ModelMapper modelMapper;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
-    private CustomUserDetails customUserDetails;
+    private final AvatarService  avatarService;
 
     @Override
-    public UserResponse insert(UserRequest userRequest) {
+    public UserEntity insert(UserRequest userRequest) {
         if (userRepository.findByUsername(userRequest.getUsername()).isPresent())
             throw new AppException(ErrorCode.USER_EXISTED);
 
@@ -47,11 +48,9 @@ public class UserImpl implements UserService {
                     .collect(Collectors.toList());
             userEntity.setRoles(roles);
         }
-
         if (userRequest.getAuthType().name().equalsIgnoreCase("LOCAL"))
             userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        UserEntity savedUserEntity = userRepository.save(userEntity);
-        return modelMapper.map(savedUserEntity, UserResponse.class);
+        return userRepository.save(userEntity);
     }
 
     @Override
@@ -61,7 +60,9 @@ public class UserImpl implements UserService {
         if (user == null) {
             return null;
         }
-        return modelMapper.map(user, UserResponse.class);
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        userResponse.setAvatar(avatarService.findByStatus(id,true));
+        return userResponse;
     }
 
     @Override
@@ -72,13 +73,15 @@ public class UserImpl implements UserService {
         if (user == null) {
             return null;
         }
+        UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        userResponse.setAvatar(avatarService.findByStatus(user.getId(),true));
         return modelMapper.map(user, UserResponse.class);
     }
 
     @Override
     @Transactional
     public void changePassword(ChangePassword request, Principal connectedUser) {
-        customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
         if (!passwordEncoder.matches(request.getCurrentPassword(), customUserDetails.getPassword())) {
             throw new IllegalStateException("Wrong password");
         }

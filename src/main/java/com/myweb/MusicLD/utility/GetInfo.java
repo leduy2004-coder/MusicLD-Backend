@@ -1,7 +1,7 @@
 package com.myweb.MusicLD.utility;
 
 import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.dto.response.UserResponse;
+import com.myweb.MusicLD.entity.UserEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,7 +12,7 @@ public class GetInfo {
         return new ModelMapper();
     }
 
-    public static UserResponse getLoggedInUserInfo() {
+    public static UserEntity getLoggedInUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() ||
                 authentication instanceof AnonymousAuthenticationToken) {
@@ -20,7 +20,7 @@ public class GetInfo {
         }
         ModelMapper mapper = getMapper();
         if (authentication.getPrincipal() instanceof CustomUserDetails userPrincipal) {
-            return mapper.map(userPrincipal.getUser(), UserResponse.class);
+            return mapper.map(userPrincipal.getUser(), UserEntity.class);
         }
         return null;
     }

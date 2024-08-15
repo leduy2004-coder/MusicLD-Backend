@@ -11,4 +11,5 @@ public interface AvatarService {
 
      AvatarResponse findByStatus(BigInteger id,Boolean status);
      Boolean deleteImage(String publicId);
+     void updatedAvatars();
 }

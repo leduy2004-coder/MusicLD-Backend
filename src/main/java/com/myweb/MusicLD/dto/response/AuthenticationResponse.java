@@ -16,5 +16,4 @@ public class AuthenticationResponse {
     @JsonProperty("access_token")
     private String accessToken;
     private UserResponse userResponse;
-    private AvatarResponse avatar;
 }

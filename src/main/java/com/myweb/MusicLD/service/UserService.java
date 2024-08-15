@@ -11,7 +11,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface UserService {
-    UserResponse insert(UserRequest userDto);
+    UserEntity insert(UserRequest userDto);
 
     UserResponse findById(BigInteger id);
     UserResponse findByUsername(String userName);

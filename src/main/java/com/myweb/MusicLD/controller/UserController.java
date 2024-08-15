@@ -6,13 +6,13 @@ import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.security.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 
@@ -22,7 +22,6 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final AuthenticationService service;
-    private final TokenRedisService tokenRedisService;
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
@@ -52,14 +51,10 @@ public class UserController {
         return ResponseEntity.ok("Change password ok");
     }
 
-    @PostMapping("/get-user")
-    public ApiResponse<AuthenticationResponse> getUser (@RequestBody UserRequest user) {
-        UserResponse userResponse = userService.findById(user.getId());
-        AuthenticationResponse result = AuthenticationResponse.builder()
-                .accessToken(tokenRedisService.getRefreshToken(userResponse.getUsername()))
-                .userResponse(userResponse)
-                .build();
-        return ApiResponse.<AuthenticationResponse>builder().result(result).build();
+    @GetMapping("/get-user")
+    public ApiResponse<UserResponse> getUser (@RequestParam(value = "id") String id) {
+        UserResponse userResponse = userService.findById(BigInteger.valueOf(Long.parseLong(id)));
+        return ApiResponse.<UserResponse>builder().result(userResponse).build();
     }
 
 }

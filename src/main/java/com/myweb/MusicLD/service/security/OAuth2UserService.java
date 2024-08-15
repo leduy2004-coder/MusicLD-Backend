@@ -17,14 +17,12 @@ import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
 import com.myweb.MusicLD.utility.AuthenticationType;
-import com.myweb.MusicLD.utility.GetInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +69,7 @@ public class OAuth2UserService {
     @NonFinal
     protected final String GRANT_TYPE = "authorization_code";
     String urlAvatar = null;
+    private AvatarEntity avatarEntity;
 
     public AuthenticationResponse getUserInfo(String provider, String code) {
         Oauth2UserResponse oauth2UserResponse = new Oauth2UserResponse();
@@ -119,11 +118,16 @@ public class OAuth2UserService {
         UserEntity existingUser = userRepository.findByUsername(userEntity.getUsername()).orElse(null);
         if (existingUser != null) {
             tokenRedisService.clearByUserName(existingUser.getNickName());
+            avatarEntity= new AvatarEntity();
         } else {
-            UserResponse userResponse = userService.insert(modelMapper.map(userEntity, UserRequest.class));
-            existingUser = modelMapper.map(userResponse, UserEntity.class);
+            existingUser = userService.insert(modelMapper.map(userEntity, UserRequest.class));
+            avatarEntity = avatarRepository.save(AvatarEntity.builder()
+                    .url(urlAvatar)
+                    .userEntity(existingUser)
+                    .status(true)
+                    .build());
         }
-        return loginOauth2(existingUser);
+        return loginOauth2(existingUser, avatarEntity);
     }
 
     public UserEntity convertToUserEntity(Oauth2UserResponse oauth2User, String clientName) {
@@ -164,7 +168,7 @@ public class OAuth2UserService {
                 .build();
     }
 
-    public AuthenticationResponse loginOauth2(UserEntity user) {
+    public AuthenticationResponse loginOauth2(UserEntity user, AvatarEntity avatarEntity) {
         CustomUserDetails customUserDetails = new CustomUserDetails();
         customUserDetails.setUser(user);
         String accessToken = jwtService.generateToken(customUserDetails);
@@ -172,14 +176,16 @@ public class OAuth2UserService {
         assert user != null;
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        avatarRepository.save(AvatarEntity.builder()
-                .url(urlAvatar)
-                .userEntity(user)
-                .status(true)
-                .build());
+        if (avatarEntity.getUrl() != null){
+            userResponse.setAvatar(AvatarResponse.builder()
+                    .publicId(avatarEntity.getPublicId())
+                    .url(avatarEntity.getUrl())
+                    .build());
+        }else {
+            userResponse.setAvatar(avatarService.findByStatus(user.getId(),true));
+        }
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
-                .avatar(avatarService.findByStatus(user.getId(), true))
                 .userResponse(userResponse)
                 .build();
     }

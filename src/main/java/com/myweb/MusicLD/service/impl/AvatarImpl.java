@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -63,17 +64,18 @@ public class AvatarImpl implements AvatarService {
         return true;
     }
 
-
-    private void updatedAvatars() {
+    @Override
+    public void updatedAvatars() {
         BigInteger userId = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId();
         List<AvatarEntity> activeAvatars = avatarRepository.findByStatusAndUser(userId, true);
+
         if (!activeAvatars.isEmpty()) {
-            Stream<AvatarEntity> avatarEntityStream = activeAvatars.stream()
-                    .map(avatarEntity -> {
-                        avatarEntity.setStatus(false);
-                        return avatarRepository.save(avatarEntity);
-                    });
+            activeAvatars.forEach(avatarEntity -> {
+                avatarEntity.setStatus(false);
+                avatarRepository.save(avatarEntity);
+            });
         }
     }
+
 
 }
