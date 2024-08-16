@@ -32,7 +32,7 @@ public class UserImpl implements UserService {
     private final ModelMapper modelMapper;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
-    private final AvatarService  avatarService;
+    private final AvatarService avatarService;
 
     @Override
     public UserEntity insert(UserRequest userRequest) {
@@ -61,7 +61,7 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(id,true));
+        userResponse.setAvatar(avatarService.findByStatus(id, true));
         return userResponse;
     }
 
@@ -74,7 +74,7 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(user.getId(),true));
+        userResponse.setAvatar(avatarService.findByStatus(user.getId(), true));
         return modelMapper.map(user, UserResponse.class);
     }
 
@@ -95,7 +95,7 @@ public class UserImpl implements UserService {
     @Override
     public List<UserResponse> findAll() {
         List<UserEntity> list = userRepository.findAll();
-        return list.stream().map(UserEntity -> modelMapper.map(UserEntity,UserResponse.class)).collect(Collectors.toList());
+        return list.stream().map(UserEntity -> modelMapper.map(UserEntity, UserResponse.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -109,7 +109,12 @@ public class UserImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserResponse> searchUsers(String searchString) {
         return userRepository.searchUsers(searchString).stream()
-                .map(userEntity -> modelMapper.map(userEntity, UserResponse.class))
+                .map(userEntity -> {
+                            UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
+                            userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true));
+                            return userResponse;
+                        }
+                )
                 .toList();
     }
 
