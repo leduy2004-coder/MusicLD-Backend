@@ -23,6 +23,8 @@ public enum ErrorCode {
     UPLOAD_FAILED(1012, "Failed to upload file", HttpStatus.BAD_REQUEST),
     FILE_TOO_LARGE(1013, "File size exceeds the limit of 2MB", HttpStatus.BAD_REQUEST), // 400
     INVALID_FILE_EXTENSION(1014, "Invalid file extension. Allowed extensions are jpg, png, gif, bmp", HttpStatus.BAD_REQUEST), // 400
+    ALREADY_FOLLOWING(1015, "Already followed", HttpStatus.BAD_REQUEST),
+    NOT_FOLLOWING(1016, "Unfollowed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

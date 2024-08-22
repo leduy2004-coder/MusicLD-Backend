@@ -10,11 +10,15 @@ import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
+import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
-import com.myweb.MusicLD.utility.AuthenticationType;
+import com.myweb.MusicLD.utility.GetInfo;
+import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class UserImpl implements UserService {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
+    private final FollowerService followerService;
 
     @Override
     public UserEntity insert(UserRequest userRequest) {
@@ -62,6 +67,7 @@ public class UserImpl implements UserService {
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         userResponse.setAvatar(avatarService.findByStatus(id, true));
+        userResponse.setStatusFollower(followerService.getFollowStatus(GetInfo.getLoggedInUserInfo(),user));
         return userResponse;
     }
 
@@ -107,15 +113,24 @@ public class UserImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> searchUsers(String searchString) {
-        return userRepository.searchUsers(searchString).stream()
+    public List<UserResponse> searchUsers(String searchString, String type) {
+        if(type.equalsIgnoreCase("less")) {
+            Pageable topFive = PageRequest.of(0, 5);
+            return mapUserEntitiesToResponses(userRepository.searchUsers(searchString, topFive));
+        } else {
+            return mapUserEntitiesToResponses(userRepository.searchFullUsers(searchString));
+        }
+    }
+
+    private List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
+        return userEntities.stream()
                 .map(userEntity -> {
-                            UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
-                            userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true));
-                            return userResponse;
-                        }
-                )
+                    UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
+                    userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true));
+                    return userResponse;
+                })
                 .toList();
     }
+
 
 }

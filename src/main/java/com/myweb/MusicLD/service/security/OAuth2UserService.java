@@ -16,7 +16,7 @@ import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
-import com.myweb.MusicLD.utility.AuthenticationType;
+import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;

@@ -1,7 +1,7 @@
 package com.myweb.MusicLD.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.myweb.MusicLD.utility.AuthenticationType;
+import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +32,9 @@ public class UserEntity extends BaseEntity {
     @Column(name = "dateofbirth")
     private Date dateOfBirth;
 
+    @Column(name = "gender")
+    private Boolean gender;
+
     @Enumerated(EnumType.STRING)
     private AuthenticationType authType;
 
@@ -51,4 +54,13 @@ public class UserEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleEntity> roles;
+
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<FollowerEntity> following;
+
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<FollowerEntity> followers;
+
 }

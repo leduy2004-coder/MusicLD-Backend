@@ -1,9 +1,7 @@
 package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.myweb.MusicLD.dto.request.UserRequest;
-import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.utility.TokenType;
+import com.myweb.MusicLD.utility.enumUtils.TokenType;
 import lombok.*;
 
 import java.math.BigInteger;

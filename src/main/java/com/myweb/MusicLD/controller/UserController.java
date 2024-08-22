@@ -31,8 +31,9 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<List<UserResponse>> searchUser(@RequestParam(value = "q") String result){
-        List<UserResponse> list = userService.searchUsers(result);
+    public ApiResponse<List<UserResponse>> searchUser(@RequestParam(value = "q") String result,
+                                                        @RequestParam(value = "type") String type){
+        List<UserResponse> list = userService.searchUsers(result,type);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 

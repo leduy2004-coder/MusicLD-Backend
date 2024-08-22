@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.utility;
+package com.myweb.MusicLD.utility.enumUtils;
 
 public enum AuthenticationType {
     LOCAL, FACEBOOK, GOOGLE

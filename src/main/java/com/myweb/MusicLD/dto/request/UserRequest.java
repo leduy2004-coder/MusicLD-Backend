@@ -2,7 +2,7 @@ package com.myweb.MusicLD.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.myweb.MusicLD.utility.AuthenticationType;
+import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import lombok.*;
 
 import java.math.BigInteger;
@@ -22,6 +22,7 @@ public class UserRequest {
     @Builder.Default
     private Boolean status = true;
     private String nickName;
+    private Boolean gender;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date dateOfBirth;
     private AuthenticationType authType;

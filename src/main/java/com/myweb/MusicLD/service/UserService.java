@@ -18,6 +18,6 @@ public interface UserService {
     void changePassword(ChangePassword request, Principal connectedUser);
     List<UserResponse> findAll();
     void updateAuthenticationType(String username, String oauth2ClientName);
-    List<UserResponse> searchUsers(String searchString);
+    List<UserResponse> searchUsers(String searchString, String type);
 
 }
