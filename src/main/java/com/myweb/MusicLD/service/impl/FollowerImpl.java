@@ -34,7 +34,7 @@ public class FollowerImpl implements FollowerService {
         UserEntity follower = GetInfo.getLoggedInUserInfo();
         UserEntity followed = userRepository.findById(followedId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        if (getFollowStatus(follower,followed) == null) {
+        if (getFollowStatus(follower,followed) == null && status != RequestFollowStatus.ACCEPTED) {
             followerRepository.save(FollowerEntity.builder()
                     .sender(follower)
                     .receiver(followed)
