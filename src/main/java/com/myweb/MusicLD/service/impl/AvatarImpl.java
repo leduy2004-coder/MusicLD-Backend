@@ -9,6 +9,7 @@ import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.ImageUtils;
+import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +30,8 @@ public class AvatarImpl implements AvatarService {
 
     @Override
     @Transactional
-    public AvatarResponse uploadImage(MultipartFile file) {
-        updatedAvatars();
+    public AvatarResponse uploadImage(MultipartFile file, AvatarType type) {
+        updatedAvatars(type);
         ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
         String fileName = ImageUtils.getFileName(file.getOriginalFilename());
         CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
@@ -40,7 +39,7 @@ public class AvatarImpl implements AvatarService {
                 .name(fileName)
                 .url(response.getUrl())
                 .publicId(response.getPublicId())
-                .type(file.getContentType())
+                .type(type)
                 .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
                 .status(true)
                 .build());
@@ -51,23 +50,28 @@ public class AvatarImpl implements AvatarService {
     }
 
     @Override
-    public AvatarResponse findByStatus(BigInteger id, Boolean status) {
-        List<AvatarEntity> avatarEntity = avatarRepository.findByStatusAndUser(id, status);
+    public AvatarResponse findByStatus(BigInteger id, Boolean status, AvatarType type) {
+        List<AvatarEntity> avatarEntity;
+        if (type.equals(AvatarType.USER)) {
+            avatarEntity = avatarRepository.findByStatusAndUser(id, status, type);
+        } else
+            avatarEntity = avatarRepository.findByStatusAndMusic(id, status, type);
+
         if (avatarEntity.isEmpty()) return null;
         return mapper.map(avatarEntity.getLast(), AvatarResponse.class);
     }
 
     @Override
-    public Boolean deleteImage(String publicId) {
-        updatedAvatars();
+    public Boolean deleteImage(String publicId, AvatarType type) {
+        updatedAvatars(type);
         cloudinaryService.deleteFile(publicId);
         return true;
     }
 
     @Override
-    public void updatedAvatars() {
+    public void updatedAvatars(AvatarType type) {
         BigInteger userId = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId();
-        List<AvatarEntity> activeAvatars = avatarRepository.findByStatusAndUser(userId, true);
+        List<AvatarEntity> activeAvatars = avatarRepository.findByStatusAndUser(userId, true, type);
 
         if (!activeAvatars.isEmpty()) {
             activeAvatars.forEach(avatarEntity -> {

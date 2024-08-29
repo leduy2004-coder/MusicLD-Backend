@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,4 +26,5 @@ public class UserResponse{
     private Boolean gender;
     private AvatarResponse avatar;
     private RequestFollowStatus statusFollower;
+    private List<MusicResponse> musicResponses;
 }

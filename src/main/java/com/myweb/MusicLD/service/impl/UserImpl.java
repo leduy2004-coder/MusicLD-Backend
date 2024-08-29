@@ -15,6 +15,7 @@ import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
+import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -66,7 +67,7 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(id, true));
+        userResponse.setAvatar(avatarService.findByStatus(id, true,AvatarType.USER));
         userResponse.setStatusFollower(followerService.getFollowStatus(GetInfo.getLoggedInUserInfo(),user));
         return userResponse;
     }
@@ -80,7 +81,7 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(user.getId(), true));
+        userResponse.setAvatar(avatarService.findByStatus(user.getId(), true, AvatarType.USER));
         return modelMapper.map(user, UserResponse.class);
     }
 
@@ -126,7 +127,7 @@ public class UserImpl implements UserService {
         return userEntities.stream()
                 .map(userEntity -> {
                     UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
-                    userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true));
+                    userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true,AvatarType.USER));
                     return userResponse;
                 })
                 .toList();

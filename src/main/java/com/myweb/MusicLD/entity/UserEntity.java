@@ -63,4 +63,8 @@ public class UserEntity extends BaseEntity {
     @JsonManagedReference
     private List<FollowerEntity> followers;
 
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<MusicEntity> musics;
+
 }

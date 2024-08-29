@@ -17,6 +17,7 @@ import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
+import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
@@ -182,7 +183,7 @@ public class OAuth2UserService {
                     .url(avatarEntity.getUrl())
                     .build());
         }else {
-            userResponse.setAvatar(avatarService.findByStatus(user.getId(),true));
+            userResponse.setAvatar(avatarService.findByStatus(user.getId(),true, AvatarType.USER));
         }
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)

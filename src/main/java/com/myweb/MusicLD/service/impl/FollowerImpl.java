@@ -10,6 +10,7 @@ import com.myweb.MusicLD.repository.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.utility.GetInfo;
+import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -96,7 +97,7 @@ public class FollowerImpl implements FollowerService {
             UserResponse userResponse = modelMapper.map(followerEntity,
                     UserResponse.class
             );
-            userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true));
+            userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true, AvatarType.USER));
             return userResponse;
         }).toList();
     }

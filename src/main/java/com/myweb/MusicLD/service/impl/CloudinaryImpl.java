@@ -19,15 +19,23 @@ public class CloudinaryImpl implements CloudinaryService {
 
     private final Cloudinary cloudinary;
 
-    @Transactional
     @Override
     public CloudinaryResponse uploadFile(final MultipartFile file, final String fileName) {
         try {
+
+            final long maxSizeInBytes = 5 * 1024 * 1024;
+            if (file.getSize() > maxSizeInBytes) {
+                throw new AppException(ErrorCode.FILE_TOO_LARGE);
+            }
+
+            // Upload lên Cloudinary
             final Map result = this.cloudinary.uploader()
                     .upload(file.getBytes(),
-                            Map.of("public_id",
-                                    "MusicLD/product/"
-                                            + fileName));
+                            Map.of(
+                                    "public_id", "MusicLD/product/" + fileName.trim(),
+                                    "resource_type", "auto"
+                            ));
+
             final String url = (String) result.get("secure_url");
             final String publicId = (String) result.get("public_id");
             return CloudinaryResponse.builder().publicId(publicId).url(url)
@@ -38,6 +46,9 @@ public class CloudinaryImpl implements CloudinaryService {
             throw new AppException(ErrorCode.UPLOAD_FAILED);
         }
     }
+
+
+
 
     @Override
     public void deleteFile(String publicId) {

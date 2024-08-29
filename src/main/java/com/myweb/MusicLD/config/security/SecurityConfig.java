@@ -37,6 +37,7 @@ public class SecurityConfig {
             "/mail/**",
             "/api/image/**",
             "api/follow/**",
+            "api/music/**",
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
