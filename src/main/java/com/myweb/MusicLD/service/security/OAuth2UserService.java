@@ -188,6 +188,7 @@ public class OAuth2UserService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .userResponse(userResponse)
+                .refreshToken(refreshToken)
                 .build();
     }
 

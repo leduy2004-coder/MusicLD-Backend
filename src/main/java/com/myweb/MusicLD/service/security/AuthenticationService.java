@@ -9,7 +9,6 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.UserRepository;
-import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
@@ -17,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -45,8 +43,9 @@ public class AuthenticationService {
         tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
 
         return AuthenticationResponse.builder()
-                .userResponse(modelMapper.map(userSaver,UserResponse.class))
+                .userResponse(modelMapper.map(userSaver, UserResponse.class))
                 .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -72,22 +71,29 @@ public class AuthenticationService {
             tokenRedisService.saveRefreshToken(user.getUsername(), refreshToken);
 
         } catch (Exception e) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .userResponse(userResponse)
                 .build();
     }
 
     public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = request.getHeader("Authorization");
         final String accessToken;
         final String userName;
-        if (authHeader == null || !authHeader.startsWith("Bearer"))
+        if (authHeader != null) {
+            authHeader = authHeader.replaceAll("^\"|\"$", "");
+            if (authHeader.startsWith("Bearer ")) {
+                accessToken = authHeader.substring(7);
+            } else
+                throw new AppException(ErrorCode.TOKEN_INVALID);
+        } else
             throw new AppException(ErrorCode.TOKEN_INVALID);
-        accessToken = authHeader.substring(7);
         userName = jwtService.extractUserName(accessToken);
+
         if (userName != null) {
             customUserDetails = new CustomUserDetails();
             UserEntity user = userRepository.findByUsername(userName).orElse(null);
@@ -102,6 +108,7 @@ public class AuthenticationService {
 
             return AuthenticationResponse.builder()
                     .accessToken(newAccessToken)
+                    .refreshToken(newRefreshToken)
                     .build();
         }
         return null;
