@@ -7,6 +7,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigInteger;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,9 +26,9 @@ public class MusicRequest {
     @AllArgsConstructor
     @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class MusicRequestDelete {
-        private String publicId;
-        private AvatarResponse avatarResponse;
+        private BigInteger id;
+        private String publicIdMusic;
+        private String publicIdAvatar;
     }
 }

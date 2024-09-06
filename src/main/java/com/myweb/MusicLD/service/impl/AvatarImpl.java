@@ -3,6 +3,7 @@ package com.myweb.MusicLD.service.impl;
 import com.myweb.MusicLD.dto.response.AvatarResponse;
 import com.myweb.MusicLD.dto.response.CloudinaryResponse;
 import com.myweb.MusicLD.entity.AvatarEntity;
+import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.AvatarRepository;
 import com.myweb.MusicLD.service.AvatarService;
@@ -30,19 +31,31 @@ public class AvatarImpl implements AvatarService {
 
     @Override
     @Transactional
-    public AvatarResponse uploadImage(MultipartFile file, AvatarType type) {
-        updatedAvatars(type);
+    public AvatarResponse uploadImage(MultipartFile file, AvatarType type, MusicEntity musicEntity) {
+        updatedAvatars(type,musicEntity.getId());
         ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
         String fileName = ImageUtils.getFileName(file.getOriginalFilename());
         CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
-        avatarRepository.save(AvatarEntity.builder()
-                .name(fileName)
-                .url(response.getUrl())
-                .publicId(response.getPublicId())
-                .type(type)
-                .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
-                .status(true)
-                .build());
+        if (type.equals(AvatarType.USER)) {
+            avatarRepository.save(AvatarEntity.builder()
+                    .name(fileName)
+                    .url(response.getUrl())
+                    .publicId(response.getPublicId())
+                    .type(type)
+                    .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
+                    .status(true)
+                    .build());
+        } else {
+            avatarRepository.save(AvatarEntity.builder()
+                    .name(fileName)
+                    .url(response.getUrl())
+                    .publicId(response.getPublicId())
+                    .musicEntity(musicEntity)
+                    .type(type)
+                    .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
+                    .status(true)
+                    .build());
+        }
         return AvatarResponse.builder()
                 .publicId(response.getPublicId())
                 .url(response.getUrl())
@@ -62,23 +75,27 @@ public class AvatarImpl implements AvatarService {
     }
 
     @Override
-    public Boolean deleteImage(String publicId, AvatarType type) {
-        updatedAvatars(type);
-        cloudinaryService.deleteFile(publicId);
+    public Boolean deleteImage(String publicId, AvatarType type, BigInteger id) {
+        updatedAvatars(type,id);
+        cloudinaryService.deleteFile(publicId,"image");
         return true;
     }
 
     @Override
-    public void updatedAvatars(AvatarType type) {
-        BigInteger userId = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId();
-        List<AvatarEntity> activeAvatars = avatarRepository.findByStatusAndUser(userId, true, type);
-
+    public void updatedAvatars(AvatarType type, BigInteger id) {
+        List<AvatarEntity> activeAvatars;
+        if (type.equals(AvatarType.USER)) {
+            activeAvatars = avatarRepository.findByStatusAndUser(id, true, type);
+        }else {
+            activeAvatars = avatarRepository.findByStatusAndMusic(id, true, type);
+        }
         if (!activeAvatars.isEmpty()) {
             activeAvatars.forEach(avatarEntity -> {
                 avatarEntity.setStatus(false);
                 avatarRepository.save(avatarEntity);
             });
         }
+
     }
 
 

@@ -8,7 +8,6 @@ import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -51,12 +50,17 @@ public class CloudinaryImpl implements CloudinaryService {
 
 
     @Override
-    public void deleteFile(String publicId) {
+    public void deleteFile(String publicId, String resourceType) {
         try {
-            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-            System.out.println("Image deleted successfully.");
+            Map<String, Object> options = ObjectUtils.asMap(
+                    "resource_type", resourceType
+            );
+            cloudinary.uploader().destroy(publicId, options);
+            System.out.println("Deleted successfully.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }

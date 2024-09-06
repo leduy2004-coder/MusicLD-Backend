@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigInteger;
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/music")
@@ -27,6 +30,12 @@ public class MusicController {
 
     @PostMapping("/delete")
     public ApiResponse<Boolean> deleteImage(@RequestBody MusicRequest.MusicRequestDelete request) {
-        return ApiResponse.<Boolean>builder().result(musicService.deleteMusic(request.getPublicId(), request.getAvatarResponse().getPublicId())).build();
+        return ApiResponse.<Boolean>builder().result(musicService.deleteMusic(request.getPublicIdMusic(), request.getPublicIdAvatar(), request.getId())).build();
+    }
+
+    @GetMapping("/get-playlist")
+    public ApiResponse<List<MusicResponse>> findAllRequest(@RequestParam(value = "id") BigInteger id){
+        List<MusicResponse> list = musicService.findByStatus(id,true);
+        return ApiResponse.<List<MusicResponse>>builder().result(list).build();
     }
 }

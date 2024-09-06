@@ -119,11 +119,12 @@ public class OAuth2UserService {
         UserEntity existingUser = userRepository.findByUsername(userEntity.getUsername()).orElse(null);
         if (existingUser != null) {
             tokenRedisService.clearByUserName(existingUser.getNickName());
-            avatarEntity= new AvatarEntity();
+            avatarEntity = new AvatarEntity();
         } else {
             existingUser = userService.insert(modelMapper.map(userEntity, UserRequest.class));
             avatarEntity = avatarRepository.save(AvatarEntity.builder()
                     .url(urlAvatar)
+                    .type(AvatarType.USER)
                     .userEntity(existingUser)
                     .status(true)
                     .build());
@@ -177,13 +178,13 @@ public class OAuth2UserService {
         assert user != null;
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        if (avatarEntity.getUrl() != null){
+        if (avatarEntity.getUrl() != null) {
             userResponse.setAvatar(AvatarResponse.builder()
                     .publicId(avatarEntity.getPublicId())
                     .url(avatarEntity.getUrl())
                     .build());
-        }else {
-            userResponse.setAvatar(avatarService.findByStatus(user.getId(),true, AvatarType.USER));
+        } else {
+            userResponse.setAvatar(avatarService.findByStatus(user.getId(), true, AvatarType.USER));
         }
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)

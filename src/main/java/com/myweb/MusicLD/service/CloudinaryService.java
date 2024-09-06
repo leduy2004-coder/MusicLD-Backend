@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface CloudinaryService {
     CloudinaryResponse uploadFile(final MultipartFile file, final String fileName);
-    void deleteFile(String publicId);
+    void deleteFile(String publicId,String resourceType);
 }

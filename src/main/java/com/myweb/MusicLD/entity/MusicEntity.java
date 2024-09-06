@@ -18,7 +18,7 @@ import java.util.List;
 @Table(name = "music")
 public class MusicEntity extends BaseEntity {
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, columnDefinition = "NVARCHAR(255)")
     private String title;
 
     @Column(name = "url")
@@ -34,7 +34,7 @@ public class MusicEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
-    @JoinColumn(name = "music_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity userEntity;
 
     @OneToMany(mappedBy = "musicEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
