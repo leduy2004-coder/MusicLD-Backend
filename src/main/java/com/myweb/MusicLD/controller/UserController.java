@@ -26,19 +26,19 @@ public class UserController {
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
             @RequestBody UserRequest request
-    )  {
+    ) {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
     }
 
     @GetMapping("/search")
     public ApiResponse<List<UserResponse>> searchUser(@RequestParam(value = "q") String result,
-                                                        @RequestParam(value = "type") String type){
-        List<UserResponse> list = userService.searchUsers(result,type);
+                                                      @RequestParam(value = "type") String type) {
+        List<UserResponse> list = userService.searchUsers(result, type);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 
     @GetMapping("/get-all")
-    public ApiResponse<List<UserResponse>> findAll(){
+    public ApiResponse<List<UserResponse>> findAll() {
         List<UserResponse> list = userService.findAll();
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
@@ -53,9 +53,16 @@ public class UserController {
     }
 
     @GetMapping("/get-user")
-    public ApiResponse<UserResponse> getUser (@RequestParam(value = "id") String id) {
+    public ApiResponse<UserResponse> getUser(@RequestParam(value = "id") String id) {
         UserResponse userResponse = userService.findById(BigInteger.valueOf(Long.parseLong(id)));
         return ApiResponse.<UserResponse>builder().result(userResponse).build();
     }
 
+    @PatchMapping("/update-user")
+    public ApiResponse<UserResponse> updateUserPartially(
+            @RequestBody UserRequest userRequest) {
+        UserResponse userResponse = userService.updateById(userRequest);
+        return ApiResponse.<UserResponse>builder().result(userResponse).build();
+
+    }
 }

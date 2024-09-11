@@ -19,5 +19,6 @@ public interface UserService {
     List<UserResponse> findAll();
     void updateAuthenticationType(String username, String oauth2ClientName);
     List<UserResponse> searchUsers(String searchString, String type);
+    UserResponse updateById(UserRequest userRequest);
 
 }

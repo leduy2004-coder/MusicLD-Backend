@@ -2,7 +2,6 @@ package com.myweb.MusicLD.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.myweb.MusicLD.dto.response.AvatarResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +15,12 @@ import java.math.BigInteger;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MusicRequest {
-    private String title;
-    private String lyrics;
-    private MultipartFile fileAvatar;
-    private MultipartFile fileMusic;
+    BigInteger id;
+    String title;
+    String lyrics;
+    MultipartFile fileAvatar;
+    MultipartFile fileMusic;
+    String publicIdAvatar;
 
     @Data
     @NoArgsConstructor
@@ -27,8 +28,8 @@ public class MusicRequest {
     @Builder
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class MusicRequestDelete {
-        private BigInteger id;
-        private String publicIdMusic;
-        private String publicIdAvatar;
+        BigInteger id;
+        String publicIdMusic;
+        String publicIdAvatar;
     }
 }

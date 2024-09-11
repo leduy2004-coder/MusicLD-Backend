@@ -24,7 +24,7 @@ public class MusicController {
             @RequestParam("avatar") MultipartFile avatar,
             @RequestParam("file") MultipartFile file,
             @RequestParam("lyrics") String lyrics) {
-        MusicRequest request = new MusicRequest(songName,lyrics, avatar, file);
+        MusicRequest request = new MusicRequest(null,songName,lyrics, avatar, file,null);
         return ApiResponse.<MusicResponse>builder().result(musicService.uploadMusic(request)).build();
     }
 
@@ -38,4 +38,17 @@ public class MusicController {
         List<MusicResponse> list = musicService.findByStatus(id,true);
         return ApiResponse.<List<MusicResponse>>builder().result(list).build();
     }
+    @PatchMapping("/update-music")
+    public ApiResponse<MusicResponse> updateMusic(
+            @RequestParam("id") BigInteger id,
+            @RequestParam("title") String title,
+            @RequestParam("lyrics") String lyrics,
+            @RequestParam(value = "fileAvatar", required = false) MultipartFile fileAvatar,
+            @RequestParam(value = "publicIdAvatar", required = false) String publicIdAvatar) {
+        MusicRequest musicRequest = new MusicRequest(id,title,lyrics, fileAvatar, null,publicIdAvatar);
+        MusicResponse musicResponse = musicService.updateById(musicRequest);
+        return ApiResponse.<MusicResponse>builder().result(musicResponse).build();
+
+    }
+
 }

@@ -72,5 +72,18 @@ public class MusicImpl implements MusicService {
         return true;
     }
 
+    @Override
+    public MusicResponse updateById(MusicRequest musicRequest) {
+        MusicEntity music = musicRepository.findById(musicRequest.getId()).orElse(null);
+        assert music != null;
+        music.setLyrics(musicRequest.getLyrics());
+        music.setTitle(musicRequest.getTitle());
+        MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
+        if(musicRequest.getFileAvatar() !=null){
+            avatarService.deleteImage(musicRequest.getPublicIdAvatar(),AvatarType.MUSIC,musicRequest.getId());
+            musicResponse.setAvatarResponse(avatarService.uploadImage(musicRequest.getFileAvatar(), AvatarType.MUSIC, music));
+        }
+        return musicResponse;
+    }
 
 }

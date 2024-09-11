@@ -123,6 +123,16 @@ public class UserImpl implements UserService {
         }
     }
 
+    @Override
+    public UserResponse updateById(UserRequest userRequest) {
+        UserEntity userEntity = userRepository.findById(userRequest.getId()).orElseThrow();
+        userEntity.setGender(userRequest.getGender());
+        userEntity.setDateOfBirth(userRequest.getDateOfBirth());
+        userEntity.setNickName(userRequest.getNickName());
+        UserEntity user = userRepository.save(userEntity);
+        return modelMapper.map(user, UserResponse.class);
+    }
+
     private List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
         return userEntities.stream()
                 .map(userEntity -> {
