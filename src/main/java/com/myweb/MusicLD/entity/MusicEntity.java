@@ -2,6 +2,7 @@ package com.myweb.MusicLD.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,6 +32,11 @@ public class MusicEntity extends BaseEntity {
     private String lyrics;
 
     private String publicId;
+
+    private int duration;
+
+    @Enumerated(EnumType.STRING)
+    private AccessMusic access;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference

@@ -1,5 +1,7 @@
 package com.myweb.MusicLD.controller;
 
+import com.myweb.MusicLD.dto.request.MusicRequest;
+import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.FollowerService;
@@ -18,23 +20,25 @@ public class FollowerController {
     private final FollowerService followerService;
 
     @GetMapping("/get-all-follower/{id}")
-    public ApiResponse<List<UserResponse>> findAllFollower(@PathVariable BigInteger id){
+    public ApiResponse<List<UserResponse>> findAllFollower(@PathVariable BigInteger id) {
         List<UserResponse> list = followerService.findAllFollowers(id);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
+
     @GetMapping("/get-all-request/{id}")
-    public ApiResponse<List<UserResponse>> findAllRequest(@PathVariable BigInteger id){
+    public ApiResponse<List<UserResponse>> findAllRequest(@PathVariable BigInteger id) {
         List<UserResponse> list = followerService.findAllRequestFollow(id);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 
     @GetMapping("/get-all-receive/{id}")
-    public ApiResponse<List<UserResponse>> findAllReceive(@PathVariable BigInteger id){
+    public ApiResponse<List<UserResponse>> findAllReceive(@PathVariable BigInteger id) {
         List<UserResponse> list = followerService.findAllReceiverFollow(id);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
+
     @GetMapping("/get-all-following/{id}")
-    public ApiResponse<List<UserResponse>> findAllFollowing(@PathVariable BigInteger id){
+    public ApiResponse<List<UserResponse>> findAllFollowing(@PathVariable BigInteger id) {
         List<UserResponse> list = followerService.findAllFollowing(id);
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
@@ -46,4 +50,8 @@ public class FollowerController {
         return ApiResponse.<RequestFollowStatus>builder().result(statusUpdate).build();
     }
 
+    @PostMapping("/check-follow/{id}")
+    public ApiResponse<Boolean> deleteImage(@PathVariable BigInteger id) {
+        return ApiResponse.<Boolean>builder().result(followerService.checkFollow(id)).build();
+    }
 }

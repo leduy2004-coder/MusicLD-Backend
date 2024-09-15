@@ -22,7 +22,7 @@ public class CloudinaryImpl implements CloudinaryService {
     public CloudinaryResponse uploadFile(final MultipartFile file, final String fileName) {
         try {
 
-            final long maxSizeInBytes = 5 * 1024 * 1024;
+            final long maxSizeInBytes = 6 * 1024 * 1024;
             if (file.getSize() > maxSizeInBytes) {
                 throw new AppException(ErrorCode.FILE_TOO_LARGE);
             }

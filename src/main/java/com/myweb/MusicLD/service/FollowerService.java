@@ -14,4 +14,5 @@ public interface FollowerService {
     List<UserResponse> findAllFollowers(BigInteger id);
     List<UserResponse> findAllRequestFollow(BigInteger id);
     List<UserResponse> findAllReceiverFollow(BigInteger id);
+    Boolean checkFollow(BigInteger id);
 }

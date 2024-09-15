@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.repository;
 
 import com.myweb.MusicLD.entity.MusicEntity;
+import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,9 @@ public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> 
 
     @Query("SELECT a from MusicEntity a WHERE a.status = ?2 and a.userEntity.id=?1")
     List<MusicEntity> findByStatusAndMusic(BigInteger id, Boolean status);
+
+    @Query("SELECT a from MusicEntity a WHERE a.status = ?2 and a.userEntity.id=?1 and a.access = ?3")
+    List<MusicEntity> findByStatusAndMusicAndAccess(BigInteger id, Boolean status, AccessMusic accessMusic);
 
     @Modifying
     @Transactional

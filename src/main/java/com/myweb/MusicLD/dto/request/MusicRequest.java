@@ -2,6 +2,7 @@ package com.myweb.MusicLD.dto.request;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,7 @@ public class MusicRequest {
     MultipartFile fileAvatar;
     MultipartFile fileMusic;
     String publicIdAvatar;
+    String accessMusic;
 
     @Data
     @NoArgsConstructor

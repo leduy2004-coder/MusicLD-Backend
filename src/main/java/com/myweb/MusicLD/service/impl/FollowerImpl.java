@@ -85,6 +85,14 @@ public class FollowerImpl implements FollowerService {
         return findUsersByFollowStatus(id, RequestFollowStatus.PENDING, false);
     }
 
+    @Override
+    public Boolean checkFollow(BigInteger id) {
+        UserEntity follower = GetInfo.getLoggedInUserInfo();
+        UserEntity followed = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return getFollowStatus(follower,followed) ==  RequestFollowStatus.ACCEPTED;
+    }
+
     private List<UserResponse> findUsersByFollowStatus(BigInteger id, RequestFollowStatus status, boolean isFollower) {
         List<UserEntity> list;
         if (isFollower) {
