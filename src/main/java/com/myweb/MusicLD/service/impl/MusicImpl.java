@@ -61,6 +61,7 @@ public class MusicImpl implements MusicService {
         return MusicResponse.builder()
                 .publicId(response.getPublicId())
                 .url(response.getUrl())
+                .idUser(music.getUserEntity().getId())
                 .avatarResponse(avatarResponse)
                 .build();
     }
@@ -75,6 +76,7 @@ public class MusicImpl implements MusicService {
         MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
         musicResponse.setAvatarResponse(avatarService.findByStatus(musicId, true,AvatarType.MUSIC));
         musicResponse.setNickName(music.getUserEntity().getNickName());
+        musicResponse.setIdUser(music.getUserEntity().getId());
         return musicResponse;
     }
 
@@ -90,6 +92,7 @@ public class MusicImpl implements MusicService {
         return musics.stream()
                 .map(MusicEntity -> {
                     MusicResponse musicResponse = mapper.map(MusicEntity, MusicResponse.class);
+                    musicResponse.setIdUser(MusicEntity.getUserEntity().getId());
                     musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
                     return musicResponse;
                 }).collect(Collectors.toList());

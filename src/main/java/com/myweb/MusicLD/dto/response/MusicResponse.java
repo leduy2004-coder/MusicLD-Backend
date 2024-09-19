@@ -20,6 +20,7 @@ public class MusicResponse {
     private String lyrics;
     private int duration;
     private String nickName;
+    private BigInteger idUser;
     private AccessMusic access;
     private AvatarResponse avatarResponse;
 }
