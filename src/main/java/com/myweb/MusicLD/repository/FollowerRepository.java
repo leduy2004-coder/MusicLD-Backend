@@ -26,4 +26,6 @@ public interface FollowerRepository extends JpaRepository<FollowerEntity, BigInt
     @Query("SELECT a.sender from FollowerEntity a WHERE a.status = ?2 and a.receiver.id=?1")
     List<UserEntity> findAllSenders(BigInteger id, RequestFollowStatus status);
 
+    @Query("SELECT COUNT(f) FROM FollowerEntity f WHERE f.receiver.id = :id AND f.status = :status")
+    long countFollowersByReceiverId(@Param("id") BigInteger receiverId, @Param("status") RequestFollowStatus status);
 }

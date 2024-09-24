@@ -106,9 +106,12 @@ public class FollowerImpl implements FollowerService {
                     UserResponse.class
             );
             userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true, AvatarType.USER));
+            userResponse.setCountFollower(countFollowers(userResponse.getId()));
             return userResponse;
         }).toList();
     }
-
+    private long countFollowers(BigInteger id) {
+        return followerRepository.countFollowersByReceiverId(id, RequestFollowStatus.ACCEPTED);
+    }
 
 }

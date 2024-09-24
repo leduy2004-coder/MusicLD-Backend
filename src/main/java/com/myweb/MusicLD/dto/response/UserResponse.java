@@ -27,4 +27,5 @@ public class UserResponse{
     private AvatarResponse avatar;
     private RequestFollowStatus statusFollower;
     private List<MusicResponse> musicResponses;
+    private long countFollower;
 }
