@@ -9,6 +9,7 @@ spring:
     redis:
       host: localhost
       port: 6379
+
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: ${DATABASE_URL}
@@ -28,7 +29,7 @@ spring:
     security:
       jwt:
         secret-key: ${JWT_SECRET_KEY}
-        expiration: 1800000 # 1 day in milliseconds
+        expiration: 3600000    # 1 h in milliseconds
         refresh-token:
           expiration: 604800000 # 7 days in milliseconds
 
@@ -69,6 +70,9 @@ spring:
       mode: always
       data-locations: classpath:data.sql
 
+  elasticsearch:
+    uris: http://localhost:9200
+
 
 payment:
   vnPay:
@@ -87,4 +91,5 @@ cloudinary:
   cloud-name: ${CLOUD_NAME}
   api-key: ${API_KEY}
   api-secret: ${API_SECRET}
+
 

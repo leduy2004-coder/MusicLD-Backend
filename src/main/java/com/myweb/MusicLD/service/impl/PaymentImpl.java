@@ -4,7 +4,7 @@ import com.myweb.MusicLD.config.payment.VNPAYConfig;
 import com.myweb.MusicLD.dto.request.PaymentRequest;
 import com.myweb.MusicLD.dto.response.PaymentResponse;
 import com.myweb.MusicLD.entity.PaymentEntity;
-import com.myweb.MusicLD.repository.PaymentRepository;
+import com.myweb.MusicLD.repository.jpa.PaymentRepository;
 import com.myweb.MusicLD.service.PaymentService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.VNPayUtil;

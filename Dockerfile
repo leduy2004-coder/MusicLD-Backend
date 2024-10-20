@@ -1,23 +1,23 @@
-## syntax=docker/dockerfile:1
-##Which "official Java image" ?
-#FROM openjdk:24-oraclelinux8
-##working directory
-#WORKDIR /app
-##copy from your Host(PC, laptop) to container
-#COPY .mvn/ .mvn
-#COPY mvnw pom.xml ./
-##Run this inside the image
-#RUN ./mvnw dependency:go-offline
-#COPY src ./src
-##run inside container
-#CMD ["./mvnw", "spring-boot:run"]
+# Stage 1: Build với Maven và Amazon Corretto 21
+FROM maven:3.9.8-amazoncorretto-21 AS build
 
-FROM openjdk:17
+# Copy source code và pom.xml vào /app folder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
 
-ARG FILE_JAR=target/*.jar
+# Build source code với Maven
+RUN mvn package -DskipTests
 
-ADD ${FILE_JAR} MusicLD.jar
+# Stage 2: Chạy ứng dụng với OpenJDK 22
+FROM openjdk:22-jdk
 
-ENTRYPOINT ["java","-jar","/MusicLD.jar"]
+# Set working folder to /app và copy compiled file từ bước build
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
+# Chạy ứng dụng
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+# Expose port 8080
 EXPOSE 8080

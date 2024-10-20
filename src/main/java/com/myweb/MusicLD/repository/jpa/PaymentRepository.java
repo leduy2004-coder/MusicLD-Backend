@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.repository;
+package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.entity.PaymentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

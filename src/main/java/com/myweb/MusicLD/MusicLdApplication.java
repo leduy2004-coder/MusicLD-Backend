@@ -7,12 +7,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+@EnableFeignClients // Kích hoạt Feign Clients
 @EnableJpaRepositories
-@EnableFeignClients
 public class MusicLdApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MusicLdApplication.class, args);
 	}
-
 }

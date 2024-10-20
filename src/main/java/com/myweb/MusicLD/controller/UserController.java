@@ -65,4 +65,10 @@ public class UserController {
         return ApiResponse.<UserResponse>builder().result(userResponse).build();
 
     }
+
+    @GetMapping("/get-top-user")
+    public ApiResponse<List<UserResponse>> getTopUser() {
+        List<UserResponse> list = userService.getTopUsers();
+        return ApiResponse.<List<UserResponse>>builder().result(list).build();
+    }
 }

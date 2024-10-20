@@ -5,7 +5,7 @@ import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.repository.RoleRepository;
+import com.myweb.MusicLD.repository.jpa.RoleRepository;
 import com.myweb.MusicLD.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

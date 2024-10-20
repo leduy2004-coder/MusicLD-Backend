@@ -8,7 +8,7 @@ import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.repository.UserRepository;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.service.RoleService;
@@ -29,6 +29,7 @@ import java.math.BigInteger;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +68,8 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(id, true,AvatarType.USER));
-        userResponse.setStatusFollower(followerService.getFollowStatus(GetInfo.getLoggedInUserInfo(),user));
+        userResponse.setAvatar(avatarService.findByStatus(id, true, AvatarType.USER));
+        userResponse.setStatusFollower(followerService.getFollowStatus(GetInfo.getLoggedInUserInfo(), user));
         return userResponse;
     }
 
@@ -123,6 +124,8 @@ public class UserImpl implements UserService {
         }
     }
 
+
+
     @Override
     public UserResponse updateById(UserRequest userRequest) {
         UserEntity userEntity = userRepository.findById(userRequest.getId()).orElseThrow();
@@ -133,11 +136,17 @@ public class UserImpl implements UserService {
         return modelMapper.map(user, UserResponse.class);
     }
 
+    @Override
+    public List<UserResponse> getTopUsers() {
+        Pageable pageable = PageRequest.of(0, 10);
+        return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable));
+    }
+
     private List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
         return userEntities.stream()
                 .map(userEntity -> {
                     UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);
-                    userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true,AvatarType.USER));
+                    userResponse.setAvatar(avatarService.findByStatus(userEntity.getId(), true, AvatarType.USER));
                     return userResponse;
                 })
                 .toList();

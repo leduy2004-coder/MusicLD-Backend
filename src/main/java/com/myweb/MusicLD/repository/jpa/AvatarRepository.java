@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.repository;
+package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface AvatarRepository extends JpaRepository<AvatarEntity,BigInteger>{

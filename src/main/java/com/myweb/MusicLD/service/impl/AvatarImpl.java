@@ -5,7 +5,7 @@ import com.myweb.MusicLD.dto.response.CloudinaryResponse;
 import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.repository.AvatarRepository;
+import com.myweb.MusicLD.repository.jpa.AvatarRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.utility.GetInfo;
@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

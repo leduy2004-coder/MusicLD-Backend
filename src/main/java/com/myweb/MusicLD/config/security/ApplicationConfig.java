@@ -3,7 +3,7 @@ package com.myweb.MusicLD.config.security;
 import com.myweb.MusicLD.config.JpaAuditingConfig;
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.repository.UserRepository;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

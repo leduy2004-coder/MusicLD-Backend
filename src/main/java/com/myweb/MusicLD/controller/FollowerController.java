@@ -1,7 +1,5 @@
 package com.myweb.MusicLD.controller;
 
-import com.myweb.MusicLD.dto.request.MusicRequest;
-import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.FollowerService;

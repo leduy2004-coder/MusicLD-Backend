@@ -20,14 +20,14 @@ public class UserEntity extends BaseEntity {
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "nickname")
+    private String nickName;
+
     @Column(name = "password")
     private String password;
 
     @Column(name = "status")
     private Boolean status;
-
-    @Column(name = "nickname")
-    private String nickName;
 
     @Column(name = "dateofbirth")
     private Date dateOfBirth;
@@ -37,6 +37,7 @@ public class UserEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private AuthenticationType authType;
+
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference

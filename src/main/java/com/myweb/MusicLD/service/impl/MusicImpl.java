@@ -6,7 +6,7 @@ import com.myweb.MusicLD.dto.response.CloudinaryResponse;
 import com.myweb.MusicLD.dto.response.MusicResponse;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.repository.MusicRepository;
+import com.myweb.MusicLD.repository.jpa.MusicRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.service.MusicService;
