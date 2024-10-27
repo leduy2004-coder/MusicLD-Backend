@@ -2,7 +2,6 @@ package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +25,6 @@ public class UserResponse{
     private Boolean gender;
     private AvatarResponse avatar;
     private RequestFollowStatus statusFollower;
-    private List<MusicResponse> musicResponses;
+    private List<CommentResponse> musicResponses;
     private long countFollower;
 }

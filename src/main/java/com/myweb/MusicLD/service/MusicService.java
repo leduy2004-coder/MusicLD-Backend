@@ -1,10 +1,8 @@
 package com.myweb.MusicLD.service;
 
 import com.myweb.MusicLD.dto.request.MusicRequest;
-import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.CommentResponse;
 import com.myweb.MusicLD.dto.response.MusicResponse;
-import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;

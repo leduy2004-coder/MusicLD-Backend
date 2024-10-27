@@ -142,7 +142,8 @@ public class UserImpl implements UserService {
         return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable));
     }
 
-    private List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
+    @Override
+    public List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
         return userEntities.stream()
                 .map(userEntity -> {
                     UserResponse userResponse = modelMapper.map(userEntity, UserResponse.class);

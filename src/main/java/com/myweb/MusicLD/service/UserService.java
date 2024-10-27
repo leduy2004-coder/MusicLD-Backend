@@ -22,4 +22,5 @@ public interface UserService {
     List<UserResponse> searchUsers(String searchString, String type);
     UserResponse updateById(UserRequest userRequest);
     List<UserResponse> getTopUsers();
+    List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities);
 }

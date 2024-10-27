@@ -46,4 +46,8 @@ public class MusicEntity extends BaseEntity {
     @OneToMany(mappedBy = "musicEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<AvatarEntity> avatars;
+
+    @OneToMany(mappedBy = "musicEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<CommentEntity> comments;
 }
