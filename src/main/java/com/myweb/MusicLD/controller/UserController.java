@@ -63,7 +63,6 @@ public class UserController {
             @RequestBody UserRequest userRequest) {
         UserResponse userResponse = userService.updateById(userRequest);
         return ApiResponse.<UserResponse>builder().result(userResponse).build();
-
     }
 
     @GetMapping("/get-top-user")

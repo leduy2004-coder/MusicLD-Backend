@@ -10,6 +10,7 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
+import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.service.MusicService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ public class MusicImpl implements MusicService {
     private final MusicRepository musicRepository;
     private final ModelMapper mapper;
     private final CloudinaryService cloudinaryService;
+    private final HeartService heartService;
 
 
     @Override
@@ -76,6 +79,7 @@ public class MusicImpl implements MusicService {
         }
         MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
         musicResponse.setAvatarResponse(avatarService.findByStatus(musicId, true,AvatarType.MUSIC));
+
         musicResponse.setNickName(music.getUserEntity().getNickName());
         musicResponse.setIdUser(music.getUserEntity().getId());
         return musicResponse;
@@ -91,9 +95,13 @@ public class MusicImpl implements MusicService {
             musics = musicRepository.findByStatusAndMusic(id, status);
         if (musics.isEmpty()) return null;
         return musics.stream()
-                .map(MusicEntity -> {
-                    MusicResponse musicResponse = mapper.map(MusicEntity, MusicResponse.class);
-                    musicResponse.setIdUser(MusicEntity.getUserEntity().getId());
+                .map(musicEntity -> {
+                    MusicResponse musicResponse = mapper.map(musicEntity, MusicResponse.class);
+                    musicResponse.setIdUser(musicEntity.getUserEntity().getId());
+                    musicResponse.setUserAvatarResponse(avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER));
+                    musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
+                    musicResponse.setCountLike(heartService.countLike(musicResponse.getId()));
+                    musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
                     musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
                     return musicResponse;
                 }).collect(Collectors.toList());

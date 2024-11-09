@@ -23,4 +23,7 @@ public class MusicResponse {
     private BigInteger idUser;
     private AccessMusic access;
     private AvatarResponse avatarResponse;
+    private AvatarResponse userAvatarResponse;
+    private long countLike;
+    private boolean isLike;
 }

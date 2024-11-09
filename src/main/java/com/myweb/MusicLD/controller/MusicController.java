@@ -3,6 +3,7 @@ package com.myweb.MusicLD.controller;
 import com.myweb.MusicLD.dto.request.MusicRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.MusicResponse;
+import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.service.MusicService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,11 @@ import java.util.List;
 public class MusicController {
 
     private final MusicService musicService;
+    private final HeartService heartService;
 
     @GetMapping("/get-music")
     public ApiResponse<MusicResponse> getMusic(@RequestParam(value = "id") String id) {
-        MusicResponse musicResponse = musicService.findMusicById(BigInteger.valueOf(Long.parseLong(id)));
+         MusicResponse musicResponse = musicService.findMusicById(BigInteger.valueOf(Long.parseLong(id)));
         return ApiResponse.<MusicResponse>builder().result(musicResponse).build();
     }
     @PostMapping("/upload")
@@ -66,4 +68,14 @@ public class MusicController {
 
     }
 
+    @PostMapping("/like")
+    public ApiResponse<Boolean> like(@RequestParam(value = "userId") String userId,
+                                            @RequestParam(value = "musicId") BigInteger musicId) {
+        return ApiResponse.<Boolean>builder().result(heartService.likeMusic(BigInteger.valueOf(Long.parseLong(userId)),musicId)).build();
+    }
+    @PostMapping("/un-like")
+    public ApiResponse<Boolean> unLike(@RequestParam(value = "userId") String userId,
+                                     @RequestParam(value = "musicId") BigInteger musicId) {
+        return ApiResponse.<Boolean>builder().result(heartService.unLikeMusic(BigInteger.valueOf(Long.parseLong(userId)),musicId)).build();
+    }
 }
