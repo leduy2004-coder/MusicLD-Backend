@@ -25,4 +25,7 @@ public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> 
     @Transactional
     @Query("UPDATE MusicEntity u SET u.status = :status WHERE u.id = :id")
     void updateStatus(@Param("id") BigInteger id, @Param("status") Boolean status);
+
+    @Query("SELECT COUNT (m) from MusicEntity m where m.userEntity.id = ?2 and m.status = ?1")
+    long countMusic(Boolean status, BigInteger id);
 }

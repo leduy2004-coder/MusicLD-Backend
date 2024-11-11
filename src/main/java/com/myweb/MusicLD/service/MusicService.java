@@ -16,5 +16,6 @@ public interface MusicService {
      List<MusicResponse> findByStatus(BigInteger id, Boolean status, String accessMusic);
      Boolean deleteMusic(String pIdAvatar,String pIdMusic,BigInteger id );
      MusicResponse updateById(MusicRequest musicRequest);
+     long countMusic(BigInteger id);
 
 }

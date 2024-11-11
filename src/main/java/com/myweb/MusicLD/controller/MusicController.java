@@ -53,7 +53,11 @@ public class MusicController {
         List<MusicResponse> list = musicService.findByStatus(id, true,access );
         return ApiResponse.<List<MusicResponse>>builder().result(list).build();
     }
-
+    @GetMapping("/get-count")
+    public ApiResponse<Long> getCountMusic(@RequestParam(value = "userId") BigInteger userId) {
+        long count = musicService.countMusic(userId);
+        return ApiResponse.<Long>builder().result(count).build();
+    }
     @PatchMapping("/update-music")
     public ApiResponse<MusicResponse> updateMusic(
             @RequestParam("id") BigInteger id,

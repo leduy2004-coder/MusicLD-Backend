@@ -132,6 +132,11 @@ public class MusicImpl implements MusicService {
         return musicResponse;
     }
 
+    @Override
+    public long countMusic(BigInteger id) {
+        return musicRepository.countMusic(true, id);
+    }
+
     private AccessMusic parseAccessMusic(String accessMusic) {
         return AccessMusic.PUBLIC.name().equalsIgnoreCase(accessMusic) ? AccessMusic.PUBLIC : AccessMusic.PRIVATE;
     }
