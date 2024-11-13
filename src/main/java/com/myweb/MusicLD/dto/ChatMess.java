@@ -1,37 +1,21 @@
 package com.myweb.MusicLD.dto;
 
+import com.myweb.MusicLD.utility.enumUtils.ChatStatus;
+import lombok.*;
+
+import java.math.BigInteger;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class ChatMess {
-    private MessageType type;
-    private String content;
-    private String sender;
-
-    public enum MessageType {
-        CHAT,
-        JOIN,
-        LEAVE
-    }
-
-    public MessageType getType() {
-        return type;
-    }
-
-    public void setType(MessageType type) {
-        this.type = type;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
+    private BigInteger id;
+    private String senderName;
+    private String receiverName;
+    private String message;
+    private String avatar;
+    private String date;
+    private ChatStatus status;
 }
