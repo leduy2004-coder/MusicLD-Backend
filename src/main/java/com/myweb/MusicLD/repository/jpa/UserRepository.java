@@ -28,9 +28,15 @@ public interface UserRepository extends JpaRepository<UserEntity, BigInteger> {
 
     @Query("SELECT u FROM UserEntity u " +
             "JOIN u.followers f " +
-            "WHERE f.status != 'CANCELED' " +
+            "WHERE f.status != 'CANCELED' and u.id = f.receiver.id " +
             "GROUP BY u " +
             "ORDER BY COUNT(f) DESC")
     List<UserEntity> getTopUsersByFollowers(Pageable pageable);
+
+
+    @Query("SELECT COUNT(f) FROM UserEntity u " +
+            "JOIN u.followers f " +
+            "WHERE f.status = 'ACCEPTED' AND u.id = :id")
+    Long getCountFollowers(@Param("id") BigInteger id);
 
 }

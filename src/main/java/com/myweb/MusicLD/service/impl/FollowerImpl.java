@@ -56,6 +56,17 @@ public class FollowerImpl implements FollowerService {
     }
 
     @Override
+    public RequestFollowStatus getStatus(BigInteger followedId) {
+        UserEntity follower = GetInfo.getLoggedInUserInfo();
+        UserEntity followed = userRepository.findById(followedId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        if (getFollowStatus(follower,followed) == null) {
+            return RequestFollowStatus.CANCELED;
+        }
+        return getFollowStatus(follower, followed);
+
+    }
+
     public RequestFollowStatus getFollowStatus(UserEntity follower, UserEntity followed) {
         FollowerEntity followRequestEntity = followerRepository.findBySenderAndReceiver(follower, followed);
         if (followRequestEntity == null) {
@@ -64,7 +75,6 @@ public class FollowerImpl implements FollowerService {
         return followRequestEntity.getStatus();
 
     }
-
     @Override
     public List<UserResponse> findAllFollowing(BigInteger id) {
         return findUsersByFollowStatus(id, RequestFollowStatus.ACCEPTED, true);

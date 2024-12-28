@@ -20,7 +20,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", columnDefinition = "NVARCHAR(150)")
     private String nickName;
 
     @Column(name = "password")

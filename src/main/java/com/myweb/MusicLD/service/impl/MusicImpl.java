@@ -82,6 +82,8 @@ public class MusicImpl implements MusicService {
 
         musicResponse.setNickName(music.getUserEntity().getNickName());
         musicResponse.setIdUser(music.getUserEntity().getId());
+        musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
+        musicResponse.setCountLike(heartService.countLike(musicId));
         return musicResponse;
     }
 

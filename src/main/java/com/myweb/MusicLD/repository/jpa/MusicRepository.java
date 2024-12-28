@@ -28,4 +28,7 @@ public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> 
 
     @Query("SELECT COUNT (m) from MusicEntity m where m.userEntity.id = ?2 and m.status = ?1")
     long countMusic(Boolean status, BigInteger id);
+
+
+
 }

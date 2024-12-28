@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FollowerService {
     RequestFollowStatus updateRequestFollow(BigInteger followedId, RequestFollowStatus status);
-    RequestFollowStatus getFollowStatus(UserEntity follower, UserEntity followed);
+    RequestFollowStatus getStatus(BigInteger id);
     List<UserResponse> findAllFollowing(BigInteger id);
     List<UserResponse> findAllFollowers(BigInteger id);
     List<UserResponse> findAllRequestFollow(BigInteger id);

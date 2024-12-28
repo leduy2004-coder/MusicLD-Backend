@@ -15,7 +15,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ImageUtils {
-    public static final long MAX_FILE_SIZE = 2 * 1024 * 1024 * 2;
+    public static final long MAX_FILE_SIZE = 2 * 1024 * 1024 * 4;
 
     public static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
 

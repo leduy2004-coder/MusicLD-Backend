@@ -17,6 +17,7 @@ public class FollowerController {
 
     private final FollowerService followerService;
 
+
     @GetMapping("/get-all-follower/{id}")
     public ApiResponse<List<UserResponse>> findAllFollower(@PathVariable BigInteger id) {
         List<UserResponse> list = followerService.findAllFollowers(id);
@@ -41,6 +42,11 @@ public class FollowerController {
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 
+    @GetMapping("/get-status-following/{id}")
+    public ApiResponse<RequestFollowStatus> findStatusFollowing(@PathVariable BigInteger id) {
+        RequestFollowStatus list = followerService.getStatus(id);
+        return ApiResponse.<RequestFollowStatus>builder().result(list).build();
+    }
 
     @PatchMapping("/{id}/{status}")
     public ApiResponse<RequestFollowStatus> updateRequestFollow(@PathVariable BigInteger id, @PathVariable String status) {
