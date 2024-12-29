@@ -2,6 +2,7 @@ package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,5 +31,10 @@ public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> 
     long countMusic(Boolean status, BigInteger id);
 
 
+    @Query("SELECT u FROM MusicEntity u " +
+            "JOIN HeartEntity f ON f.musicEntity.id = u.id " +
+            "GROUP BY u " +
+            "ORDER BY COUNT(f) DESC")
+    List<MusicEntity> getTopMusicsByHeart(Pageable pageable);
 
 }

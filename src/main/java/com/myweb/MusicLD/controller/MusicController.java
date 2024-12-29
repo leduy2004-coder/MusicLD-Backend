@@ -3,6 +3,7 @@ package com.myweb.MusicLD.controller;
 import com.myweb.MusicLD.dto.request.MusicRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.MusicResponse;
+import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.service.MusicService;
 import lombok.AllArgsConstructor;
@@ -81,5 +82,11 @@ public class MusicController {
     public ApiResponse<Boolean> unLike(@RequestParam(value = "userId") String userId,
                                      @RequestParam(value = "musicId") BigInteger musicId) {
         return ApiResponse.<Boolean>builder().result(heartService.unLikeMusic(BigInteger.valueOf(Long.parseLong(userId)),musicId)).build();
+    }
+
+    @GetMapping("/get-top-music")
+    public ApiResponse<List<MusicResponse>> getTopMusic() {
+        List<MusicResponse> list = musicService.getTopMusics();
+        return ApiResponse.<List<MusicResponse>>builder().result(list).build();
     }
 }

@@ -1,10 +1,7 @@
 package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.request.MusicRequest;
-import com.myweb.MusicLD.dto.response.AvatarResponse;
-import com.myweb.MusicLD.dto.response.CloudinaryResponse;
-import com.myweb.MusicLD.dto.response.CommentResponse;
-import com.myweb.MusicLD.dto.response.MusicResponse;
+import com.myweb.MusicLD.dto.response.*;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
@@ -17,6 +14,8 @@ import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,7 +78,7 @@ public class MusicImpl implements MusicService {
         }
         MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
         musicResponse.setAvatarResponse(avatarService.findByStatus(musicId, true,AvatarType.MUSIC));
-
+        musicResponse.setUserAvatarResponse(avatarService.findByStatus(music.getUserEntity().getId(), true, AvatarType.USER));
         musicResponse.setNickName(music.getUserEntity().getNickName());
         musicResponse.setIdUser(music.getUserEntity().getId());
         musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
@@ -96,17 +95,7 @@ public class MusicImpl implements MusicService {
         else
             musics = musicRepository.findByStatusAndMusic(id, status);
         if (musics.isEmpty()) return null;
-        return musics.stream()
-                .map(musicEntity -> {
-                    MusicResponse musicResponse = mapper.map(musicEntity, MusicResponse.class);
-                    musicResponse.setIdUser(musicEntity.getUserEntity().getId());
-                    musicResponse.setUserAvatarResponse(avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER));
-                    musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
-                    musicResponse.setCountLike(heartService.countLike(musicResponse.getId()));
-                    musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
-                    musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
-                    return musicResponse;
-                }).collect(Collectors.toList());
+        return mapMusicEntitiesToResponses(musics);
     }
 
     @Override
@@ -139,6 +128,25 @@ public class MusicImpl implements MusicService {
         return musicRepository.countMusic(true, id);
     }
 
+    @Override
+    public List<MusicResponse> getTopMusics() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<MusicEntity> listMusics = musicRepository.getTopMusicsByHeart(pageable);
+        return mapMusicEntitiesToResponses(listMusics);
+    }
+    public List<MusicResponse> mapMusicEntitiesToResponses(List<MusicEntity> musics) {
+        return musics.stream()
+                .map(musicEntity -> {
+                    MusicResponse musicResponse = mapper.map(musicEntity, MusicResponse.class);
+                    musicResponse.setIdUser(musicEntity.getUserEntity().getId());
+                    musicResponse.setUserAvatarResponse(avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER));
+                    musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
+                    musicResponse.setCountLike(heartService.countLike(musicResponse.getId()));
+                    musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
+                    musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
+                    return musicResponse;
+                }).collect(Collectors.toList());
+    }
     private AccessMusic parseAccessMusic(String accessMusic) {
         return AccessMusic.PUBLIC.name().equalsIgnoreCase(accessMusic) ? AccessMusic.PUBLIC : AccessMusic.PRIVATE;
     }
