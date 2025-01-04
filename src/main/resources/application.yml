@@ -28,7 +28,6 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        #
         format_sql: true
     defer-datasource-initialization: true
 

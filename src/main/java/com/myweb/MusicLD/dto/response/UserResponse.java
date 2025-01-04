@@ -23,6 +23,7 @@ public class UserResponse{
     private Date dateOfBirth;
     private String nickName;
     private Boolean gender;
+    private RoleResponse roles;
     private AvatarResponse avatar;
     private RequestFollowStatus statusFollower;
     private List<CommentResponse> musicResponses;

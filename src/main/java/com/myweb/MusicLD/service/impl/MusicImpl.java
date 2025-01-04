@@ -10,12 +10,15 @@ import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.service.MusicService;
 import com.myweb.MusicLD.utility.GetInfo;
+import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,10 +30,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,6 +134,21 @@ public class MusicImpl implements MusicService {
         List<MusicEntity> listMusics = musicRepository.getTopMusicsByHeart(pageable);
         return mapMusicEntitiesToResponses(listMusics);
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public List<StatisticResponse> getCountMusicByYear(int year) {
+        List<Tuple> list = musicRepository.getCountMusicsByYear(year);
+        return TupleMapper.mapListToDto(list, StatisticResponse.class);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public StatisticResponse getStatisticByYear(int year) {
+        Tuple tuple = musicRepository.getStatisticByYear(year);
+        return TupleMapper.mapToDto(tuple, StatisticResponse.class);
+    }
+
     public List<MusicResponse> mapMusicEntitiesToResponses(List<MusicEntity> musics) {
         return musics.stream()
                 .map(musicEntity -> {
@@ -142,7 +157,9 @@ public class MusicImpl implements MusicService {
                     musicResponse.setUserAvatarResponse(avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER));
                     musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
                     musicResponse.setCountLike(heartService.countLike(musicResponse.getId()));
-                    musicResponse.setLike(heartService.checkLike(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId(), musicResponse.getId()));
+                    if(GetInfo.getLoggedInUserInfo() != null){
+                        musicResponse.setLike(heartService.checkLike(GetInfo.getLoggedInUserInfo().getId(), musicResponse.getId()));
+                    }
                     musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
                     return musicResponse;
                 }).collect(Collectors.toList());

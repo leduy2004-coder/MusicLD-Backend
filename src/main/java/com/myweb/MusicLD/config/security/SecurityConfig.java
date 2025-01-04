@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request.requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers("/api/v1/management/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .oauth2Login(withDefaults())

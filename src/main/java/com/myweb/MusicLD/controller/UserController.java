@@ -67,7 +67,7 @@ public class UserController {
 
     @GetMapping("/get-top-user")
     public ApiResponse<List<UserResponse>> getTopUser() {
-        List<UserResponse> list = userService.getTopUsers();
+        List<UserResponse> list = userService.getTopUsersByFollower();
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 }

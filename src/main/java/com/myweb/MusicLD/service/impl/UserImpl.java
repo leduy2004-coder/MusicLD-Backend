@@ -3,6 +3,8 @@ package com.myweb.MusicLD.service.impl;
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.UserRequest;
+import com.myweb.MusicLD.dto.response.RoleResponse;
+import com.myweb.MusicLD.dto.response.StatisticResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.RoleEntity;
 import com.myweb.MusicLD.entity.UserEntity;
@@ -13,9 +15,10 @@ import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.service.RoleService;
 import com.myweb.MusicLD.service.UserService;
-import com.myweb.MusicLD.utility.GetInfo;
+import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -85,6 +89,7 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        userResponse.setRoles(modelMapper.map(user.getRoles().getFirst(), RoleResponse.class));
         userResponse.setAvatar(avatarService.findByStatus(user.getId(), true, AvatarType.USER));
         return userResponse;
     }
@@ -130,7 +135,6 @@ public class UserImpl implements UserService {
     }
 
 
-
     @Override
     public UserResponse updateById(UserRequest userRequest) {
         UserEntity userEntity = userRepository.findById(userRequest.getId()).orElseThrow();
@@ -142,11 +146,20 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getTopUsers() {
+    public List<UserResponse> getTopUsersByFollower() {
         Pageable pageable = PageRequest.of(0, 6);
         return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public List<StatisticResponse> getTopUserByMusic(int year) {
+        List<Tuple> list = userRepository.getTopUsersByMusics(year);
+        List<StatisticResponse> responses = TupleMapper.mapListToDto(list, StatisticResponse.class);
+        return responses.stream().peek(statistic -> {
+            statistic.setAvatar(avatarService.findByStatus(statistic.getUserId().toBigInteger(), true, AvatarType.USER));
+        }).toList();
+    }
     @Override
     public List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
         return userEntities.stream()

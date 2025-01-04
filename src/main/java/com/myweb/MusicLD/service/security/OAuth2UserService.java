@@ -24,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -178,6 +179,7 @@ public class OAuth2UserService {
         assert user != null;
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());
         if (avatarEntity.getUrl() != null) {
             userResponse.setAvatar(AvatarResponse.builder()
                     .publicId(avatarEntity.getPublicId())

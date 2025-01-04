@@ -2,6 +2,7 @@ package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,5 +37,12 @@ public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> 
             "GROUP BY u " +
             "ORDER BY COUNT(f) DESC")
     List<MusicEntity> getTopMusicsByHeart(Pageable pageable);
+
+    @Query(value = "EXEC dbo.spStatisticsMusicByYear :year", nativeQuery = true)
+    List<Tuple> getCountMusicsByYear(@Param("year") int year);
+
+
+    @Query(value = "SELECT * FROM dbo.fnStatisticsByYear(:year)", nativeQuery = true)
+    Tuple getStatisticByYear(@Param("year") int year);
 
 }

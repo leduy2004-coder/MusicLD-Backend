@@ -9,4 +9,5 @@ import java.math.BigInteger;
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, BigInteger> {
 
+
 }

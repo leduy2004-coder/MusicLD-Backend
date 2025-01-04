@@ -4,6 +4,7 @@ import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
+import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
@@ -21,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +43,10 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(customUserDetails);
         var refreshToken = jwtService.generateRefreshToken(customUserDetails);
         tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
-
+        UserResponse userResponse = modelMapper.map(userSaver, UserResponse.class);
+        userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());
         return AuthenticationResponse.builder()
-                .userResponse(modelMapper.map(userSaver, UserResponse.class))
+                .userResponse(userResponse)
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();
