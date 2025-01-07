@@ -22,18 +22,17 @@ public interface UserRepository extends JpaRepository<UserEntity, BigInteger> {
     @Query("UPDATE UserEntity u SET u.authType = ?2 WHERE u.username = ?1")
     void updateAuthenticationType(String username, AuthenticationType authType);
 
-    @Query("SELECT u FROM UserEntity u WHERE LOWER(u.nickName) LIKE LOWER(CONCAT('%', :searchString, '%'))")
-    List<UserEntity> searchUsers(@Param("searchString") String searchString, Pageable pageable);
+    List<UserEntity> findDistinctByRoles_CodeAndNickNameContainingIgnoreCase(String roleCode, String searchString, Pageable pageable);
 
-    @Query("SELECT u FROM UserEntity u WHERE LOWER(u.nickName) LIKE LOWER(CONCAT('%', :searchString, '%'))")
-    List<UserEntity> searchFullUsers(@Param("searchString") String searchString);
+    @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE LOWER(u.nickName) LIKE LOWER(CONCAT('%', :searchString, '%')) AND r.code = :roleCode")
+    List<UserEntity> searchFullUsers(@Param("searchString") String searchString, @Param("roleCode") String roleCode);
 
     @Query("SELECT u FROM UserEntity u " +
-            "JOIN u.followers f " +
-            "WHERE f.status != 'CANCELED' and u.id = f.receiver.id " +
+            "JOIN u.followers f JOIN u.roles r " +
+            "WHERE f.status != 'CANCELED' AND r.code = :roleCode and u.id = f.receiver.id " +
             "GROUP BY u " +
             "ORDER BY COUNT(f) DESC")
-    List<UserEntity> getTopUsersByFollowers(Pageable pageable);
+    List<UserEntity> getTopUsersByFollowers(Pageable pageable, @Param("roleCode") String roleCode);
 
 
     @Query("SELECT COUNT(f) FROM UserEntity u " +

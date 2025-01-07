@@ -6,13 +6,16 @@ import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.jpa.AvatarRepository;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
+import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.ImageUtils;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AvatarImpl implements AvatarService {
     private final AvatarRepository avatarRepository;
+    private final UserRepository userRepository;
     private final ModelMapper mapper;
     private final CloudinaryService cloudinaryService;
 
@@ -31,7 +35,7 @@ public class AvatarImpl implements AvatarService {
     @Override
     @Transactional
     public AvatarResponse uploadImage(MultipartFile file, AvatarType type, MusicEntity musicEntity) {
-        updatedAvatars(type,musicEntity.getId());
+        updatedAvatars(type, musicEntity.getId());
         ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
         String fileName = ImageUtils.getFileName(file.getOriginalFilename());
         CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
@@ -61,6 +65,32 @@ public class AvatarImpl implements AvatarService {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    @Transactional
+    public AvatarResponse uploadImageUser(MultipartFile file, BigInteger id) {
+        updatedAvatars(AvatarType.USER, id);
+        UserEntity user = userRepository.findById(id)
+                .orElse(null);
+        ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
+        String fileName = ImageUtils.getFileName(file.getOriginalFilename());
+        CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
+
+        avatarRepository.save(AvatarEntity.builder()
+                .name(fileName)
+                .url(response.getUrl())
+                .publicId(response.getPublicId())
+                .type(AvatarType.USER)
+                .userEntity(user)
+                .status(true)
+                .build());
+
+        return AvatarResponse.builder()
+                .publicId(response.getPublicId())
+                .url(response.getUrl())
+                .build();
+    }
+
     @Override
     public AvatarResponse findByStatus(BigInteger id, Boolean status, AvatarType type) {
         List<AvatarEntity> avatarEntity;
@@ -73,10 +103,11 @@ public class AvatarImpl implements AvatarService {
         return mapper.map(avatarEntity.getLast(), AvatarResponse.class);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public Boolean deleteImage(String publicId, AvatarType type, BigInteger id) {
-        updatedAvatars(type,id);
-        cloudinaryService.deleteFile(publicId,"image");
+        updatedAvatars(type, id);
+        cloudinaryService.deleteFile(publicId, "image");
         return true;
     }
 
@@ -85,7 +116,7 @@ public class AvatarImpl implements AvatarService {
         List<AvatarEntity> activeAvatars;
         if (type.equals(AvatarType.USER)) {
             activeAvatars = avatarRepository.findByStatusAndUser(id, true, type);
-        }else {
+        } else {
             activeAvatars = avatarRepository.findByStatusAndMusic(id, true, type);
         }
         if (!activeAvatars.isEmpty()) {

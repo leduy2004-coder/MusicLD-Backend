@@ -10,6 +10,7 @@ import java.math.BigInteger;
 
 public interface AvatarService {
      AvatarResponse uploadImage(MultipartFile file, AvatarType type, MusicEntity music);
+     AvatarResponse uploadImageUser(MultipartFile file, BigInteger id);
 
      AvatarResponse findByStatus(BigInteger id, Boolean status, AvatarType type);
      Boolean deleteImage(String publicId, AvatarType type, BigInteger id);

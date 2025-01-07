@@ -25,7 +25,11 @@ public class AvatarController {
         AvatarResponse avatarResponse = avatarService.uploadImage(file, AvatarType.USER, MusicEntity.builder().build());
         return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
     }
-
+    @PostMapping("/upload-user")
+    public ApiResponse<AvatarResponse> User(@RequestParam("image")MultipartFile file, @RequestParam("userId")BigInteger userId) {
+        AvatarResponse avatarResponse = avatarService.uploadImageUser(file,  userId);
+        return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
+    }
     @PostMapping("/delete")
     public ApiResponse<Boolean> deleteImage(@RequestParam("publicId") String publicId) {
         BigInteger userId = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId();

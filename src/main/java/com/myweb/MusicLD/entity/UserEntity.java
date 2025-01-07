@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity {
     private AuthenticationType authType;
 
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
     private List<PaymentEntity> payments;
 
@@ -56,11 +56,11 @@ public class UserEntity extends BaseEntity {
     )
     private List<RoleEntity> roles;
 
-    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
     private List<FollowerEntity> following;
 
-    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
     private List<FollowerEntity> followers;
 
@@ -68,7 +68,7 @@ public class UserEntity extends BaseEntity {
     @JsonManagedReference
     private List<MusicEntity> musics;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
     private List<CommentEntity> comments;
 

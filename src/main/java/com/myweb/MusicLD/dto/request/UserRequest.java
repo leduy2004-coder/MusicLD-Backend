@@ -19,8 +19,7 @@ public class UserRequest {
     private BigInteger id;
     private String username;
     private String password;
-    @Builder.Default
-    private Boolean status = true;
+    private Boolean status;
     private String nickName;
     private Boolean gender;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")

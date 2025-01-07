@@ -2,19 +2,16 @@ package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.ChangePassword;
 import com.myweb.MusicLD.dto.CustomUserDetails;
+import com.myweb.MusicLD.dto.UserInputDTO;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.dto.response.StatisticResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.entity.RoleEntity;
-import com.myweb.MusicLD.entity.UserEntity;
+import com.myweb.MusicLD.entity.*;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.jpa.UserRepository;
-import com.myweb.MusicLD.service.AvatarService;
-import com.myweb.MusicLD.service.FollowerService;
-import com.myweb.MusicLD.service.RoleService;
-import com.myweb.MusicLD.service.UserService;
+import com.myweb.MusicLD.service.*;
 import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
@@ -34,6 +31,7 @@ import java.math.BigInteger;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -44,6 +42,7 @@ public class UserImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
+    private final MusicService musicService;
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
     private final FollowerService followerService;
@@ -64,7 +63,31 @@ public class UserImpl implements UserService {
         }
         if (userRequest.getAuthType().name().equalsIgnoreCase("LOCAL"))
             userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setStatus(true);
         return userRepository.save(userEntity);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public Boolean delete(BigInteger id) {
+        try {
+            Optional<UserEntity> entity = userRepository.findById(id);
+            if (entity.isPresent()) {
+                for (AvatarEntity avatarEntity : entity.get().getAvatars()) {
+                    avatarService.deleteImage(avatarEntity.getPublicId(),AvatarType.USER, id);
+                }
+                for (MusicEntity music : entity.get().getMusics()) {
+                    musicService.deleteMusic(music);
+                }
+                userRepository.deleteById(id);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
@@ -75,6 +98,21 @@ public class UserImpl implements UserService {
             return null;
         }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+        userResponse.setAvatar(avatarService.findByStatus(id, true, AvatarType.USER));
+        userResponse.setStatusFollower(followerService.getStatus(user.getId()));
+        return userResponse;
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public UserInputDTO findUserForAdminById(BigInteger id) {
+        UserEntity user = userRepository.findById(id)
+                .orElse(null);
+        if (user == null) {
+            return null;
+        }
+        UserInputDTO userResponse = modelMapper.map(user, UserInputDTO.class);
+
         userResponse.setAvatar(avatarService.findByStatus(id, true, AvatarType.USER));
         userResponse.setStatusFollower(followerService.getStatus(user.getId()));
         return userResponse;
@@ -108,12 +146,12 @@ public class UserImpl implements UserService {
         userRepository.save(customUserDetails.getUser());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public List<UserResponse> findAll() {
         log.info("In method in admin");
         List<UserEntity> list = userRepository.findAll();
-        return list.stream().map(UserEntity -> modelMapper.map(UserEntity, UserResponse.class)).collect(Collectors.toList());
+        return mapUserEntitiesToResponses(list);
     }
 
     @Override
@@ -126,11 +164,11 @@ public class UserImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponse> searchUsers(String searchString, String type) {
-        if(type.equalsIgnoreCase("less")) {
+        if (type.equalsIgnoreCase("less")) {
             Pageable topFive = PageRequest.of(0, 5);
-            return mapUserEntitiesToResponses(userRepository.searchUsers(searchString, topFive));
+            return mapUserEntitiesToResponses(userRepository.findDistinctByRoles_CodeAndNickNameContainingIgnoreCase("USER", searchString, topFive));
         } else {
-            return mapUserEntitiesToResponses(userRepository.searchFullUsers(searchString));
+            return mapUserEntitiesToResponses(userRepository.searchFullUsers(searchString, "USER"));
         }
     }
 
@@ -141,14 +179,23 @@ public class UserImpl implements UserService {
         userEntity.setGender(userRequest.getGender());
         userEntity.setDateOfBirth(userRequest.getDateOfBirth());
         userEntity.setNickName(userRequest.getNickName());
+        userEntity.setStatus(userRequest.getStatus());
+        if (userRequest.getUsername() != null) {
+            userEntity.setUsername(userRequest.getUsername());
+        }
+        if (userRequest.getPassword() != null) {
+            userEntity.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        }
         UserEntity user = userRepository.save(userEntity);
         return modelMapper.map(user, UserResponse.class);
     }
 
+
+
     @Override
     public List<UserResponse> getTopUsersByFollower() {
         Pageable pageable = PageRequest.of(0, 6);
-        return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable));
+        return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable, "USER"));
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -160,6 +207,7 @@ public class UserImpl implements UserService {
             statistic.setAvatar(avatarService.findByStatus(statistic.getUserId().toBigInteger(), true, AvatarType.USER));
         }).toList();
     }
+
     @Override
     public List<UserResponse> mapUserEntitiesToResponses(List<UserEntity> userEntities) {
         return userEntities.stream()

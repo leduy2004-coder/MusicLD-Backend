@@ -2,6 +2,7 @@ package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.request.MusicRequest;
 import com.myweb.MusicLD.dto.response.*;
+import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
@@ -98,10 +99,20 @@ public class MusicImpl implements MusicService {
         return mapMusicEntitiesToResponses(musics);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Boolean deleteMusic(String pIdMusic, String pIdAvatar, BigInteger id) {
-        cloudinaryService.deleteFile(pIdMusic, "video");
-        avatarService.deleteImage(pIdAvatar, AvatarType.MUSIC, id);
+    public Boolean deleteMusic(MusicEntity musics) {
+        cloudinaryService.deleteFile(musics.getPublicId(), "video");
+        for (AvatarEntity avatarEntity : musics.getAvatars()) {
+            avatarService.deleteImage(avatarEntity.getPublicId(), AvatarType.MUSIC, musics.getId());
+        }
+        musicRepository.deleteById(musics.getId());
+        return true;
+    }
+
+    @Override
+    public Boolean updateStatusMusic(BigInteger id) {
+        avatarService.updatedAvatars(AvatarType.MUSIC, id);
         musicRepository.updateStatus(id, false);
         return true;
     }
