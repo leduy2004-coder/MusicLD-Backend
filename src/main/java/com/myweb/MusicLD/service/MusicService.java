@@ -17,11 +17,12 @@ public interface MusicService {
      MusicResponse uploadMusic(MusicRequest musicRequest) throws IOException, UnsupportedAudioFileException;
      MusicResponse findMusicById(BigInteger musicId);
      List<MusicResponse> findByStatus(BigInteger id, Boolean status, String accessMusic);
-     Boolean deleteMusic(MusicEntity musics);
+     Boolean deleteMusic(BigInteger id);
      Boolean updateStatusMusic(BigInteger id);
-     MusicResponse updateById(MusicRequest musicRequest);
+     MusicResponse updateMusic(MusicRequest musicRequest);
      long countMusic(BigInteger id);
      List<MusicResponse> getTopMusics();
+     List<MusicResponse> findAll();
      List<StatisticResponse> getCountMusicByYear(int year);
      StatisticResponse getStatisticByYear(int year);
 }

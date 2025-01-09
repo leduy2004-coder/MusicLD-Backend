@@ -77,7 +77,7 @@ public class UserImpl implements UserService {
                     avatarService.deleteImage(avatarEntity.getPublicId(),AvatarType.USER, id);
                 }
                 for (MusicEntity music : entity.get().getMusics()) {
-                    musicService.deleteMusic(music);
+                    musicService.deleteMusic(music.getId());
                 }
                 userRepository.deleteById(id);
                 return true;

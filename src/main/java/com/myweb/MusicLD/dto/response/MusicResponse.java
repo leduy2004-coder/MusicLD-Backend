@@ -26,4 +26,5 @@ public class MusicResponse {
     private AvatarResponse userAvatarResponse;
     private long countLike;
     private boolean isLike;
+    private boolean status;
 }

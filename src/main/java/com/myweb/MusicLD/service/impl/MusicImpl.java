@@ -6,6 +6,7 @@ import com.myweb.MusicLD.entity.AvatarEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.service.HeartService;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MusicImpl implements MusicService {
     private final AvatarService avatarService;
+    private final UserRepository userRepository;
     private final MusicRepository musicRepository;
     private final ModelMapper mapper;
     private final CloudinaryService cloudinaryService;
@@ -47,6 +49,12 @@ public class MusicImpl implements MusicService {
     @Override
     @Transactional
     public MusicResponse uploadMusic(MusicRequest musicRequest) throws IOException, UnsupportedAudioFileException {
+        UserEntity user;
+        if (musicRequest.getUserId() != null) {
+            user = userRepository.findById(musicRequest.getUserId()).orElse(null);
+        } else {
+            user = mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class);
+        }
         AccessMusic accessMusic = parseAccessMusic(musicRequest.getAccessMusic());
         CloudinaryResponse response = cloudinaryService.uploadFile(musicRequest.getFileMusic(), UUID.randomUUID().toString());
         File file = convertMultipartFileToFile(musicRequest.getFileMusic());
@@ -57,7 +65,7 @@ public class MusicImpl implements MusicService {
                 .lyrics(musicRequest.getLyrics())
                 .publicId(response.getPublicId())
                 .duration(duration)
-                .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
+                .userEntity(user)
                 .status(true)
                 .access(accessMusic)
                 .build());
@@ -78,7 +86,7 @@ public class MusicImpl implements MusicService {
             return null;
         }
         MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
-        musicResponse.setAvatarResponse(avatarService.findByStatus(musicId, true,AvatarType.MUSIC));
+        musicResponse.setAvatarResponse(avatarService.findByStatus(musicId, true, AvatarType.MUSIC));
         musicResponse.setUserAvatarResponse(avatarService.findByStatus(music.getUserEntity().getId(), true, AvatarType.USER));
         musicResponse.setNickName(music.getUserEntity().getNickName());
         musicResponse.setIdUser(music.getUserEntity().getId());
@@ -101,12 +109,14 @@ public class MusicImpl implements MusicService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Boolean deleteMusic(MusicEntity musics) {
-        cloudinaryService.deleteFile(musics.getPublicId(), "video");
-        for (AvatarEntity avatarEntity : musics.getAvatars()) {
-            avatarService.deleteImage(avatarEntity.getPublicId(), AvatarType.MUSIC, musics.getId());
+    public Boolean deleteMusic(BigInteger id) {
+        MusicEntity music = musicRepository.findById(id).orElse(null);
+        assert music != null;
+        cloudinaryService.deleteFile(music.getPublicId(), "video");
+        for (AvatarEntity avatarEntity : music.getAvatars()) {
+            avatarService.deleteImage(avatarEntity.getPublicId(), AvatarType.MUSIC, music.getId());
         }
-        musicRepository.deleteById(musics.getId());
+        musicRepository.deleteById(music.getId());
         return true;
     }
 
@@ -118,10 +128,13 @@ public class MusicImpl implements MusicService {
     }
 
     @Override
-    public MusicResponse updateById(MusicRequest musicRequest) {
+    public MusicResponse updateMusic(MusicRequest musicRequest) {
         AccessMusic accessMusic = parseAccessMusic(musicRequest.getAccessMusic());
         MusicEntity music = musicRepository.findById(musicRequest.getId()).orElse(null);
         assert music != null;
+        if(musicRequest.getStatus() != null){
+            music.setStatus(musicRequest.getStatus());
+        }
         music.setLyrics(musicRequest.getLyrics());
         music.setTitle(musicRequest.getTitle());
         music.setAccess(accessMusic);
@@ -148,6 +161,13 @@ public class MusicImpl implements MusicService {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @Override
+    public List<MusicResponse> findAll() {
+        List<MusicEntity> musics = musicRepository.findAll();
+        return mapMusicEntitiesToResponses(musics);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
     public List<StatisticResponse> getCountMusicByYear(int year) {
         List<Tuple> list = musicRepository.getCountMusicsByYear(year);
         return TupleMapper.mapListToDto(list, StatisticResponse.class);
@@ -168,13 +188,14 @@ public class MusicImpl implements MusicService {
                     musicResponse.setUserAvatarResponse(avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER));
                     musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
                     musicResponse.setCountLike(heartService.countLike(musicResponse.getId()));
-                    if(GetInfo.getLoggedInUserInfo() != null){
+                    if (GetInfo.getLoggedInUserInfo() != null) {
                         musicResponse.setLike(heartService.checkLike(GetInfo.getLoggedInUserInfo().getId(), musicResponse.getId()));
                     }
                     musicResponse.setAvatarResponse(avatarService.findByStatus(musicResponse.getId(), true, AvatarType.MUSIC));
                     return musicResponse;
                 }).collect(Collectors.toList());
     }
+
     private AccessMusic parseAccessMusic(String accessMusic) {
         return AccessMusic.PUBLIC.name().equalsIgnoreCase(accessMusic) ? AccessMusic.PUBLIC : AccessMusic.PRIVATE;
     }
@@ -190,6 +211,7 @@ public class MusicImpl implements MusicService {
             throw new UnsupportedAudioFileException();
         }
     }
+
     public File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
         // Tạo một tệp tạm thời với tên tương tự tên gốc của multipartFile
         File file = new File(System.getProperty("java.io.tmpdir") + "/" + multipartFile.getOriginalFilename());

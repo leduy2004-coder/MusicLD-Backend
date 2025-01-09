@@ -17,12 +17,14 @@ import java.math.BigInteger;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MusicRequest {
     BigInteger id;
+    BigInteger userId;
     String title;
     String lyrics;
     MultipartFile fileAvatar;
     MultipartFile fileMusic;
     String publicIdAvatar;
     String accessMusic;
+    Boolean status;
 
     @Data
     @NoArgsConstructor
