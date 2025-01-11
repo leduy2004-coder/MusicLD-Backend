@@ -20,6 +20,7 @@ import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,12 +71,16 @@ public class HeartImpl implements HeartService {
         }
         return false;
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Override
     public List<UserResponse> findAllByMusic(BigInteger musicId) {
         List<HeartEntity> likes = heartRepository.findByMusicId(musicId);
         return likes.stream()
-                .map(like -> mapper.map(like.getUserEntity(), UserResponse.class))
+                .map(like -> {
+                    UserResponse userResponse = mapper.map(like.getUserEntity(), UserResponse.class);
+                    userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true, AvatarType.USER));
+                    return userResponse;
+                })
                 .collect(Collectors.toList());
     }
 

@@ -111,7 +111,11 @@ public class MusicController {
                                      @RequestParam(value = "musicId") BigInteger musicId) {
         return ApiResponse.<Boolean>builder().result(heartService.unLikeMusic(BigInteger.valueOf(Long.parseLong(userId)),musicId)).build();
     }
-
+    @GetMapping("/get-user-like")
+    public ApiResponse<List<UserResponse>> getUsersLike(@RequestParam(value = "musicId") BigInteger musicId) {
+        List<UserResponse> list = heartService.findAllByMusic(musicId);
+        return ApiResponse.<List<UserResponse>>builder().result(list).build();
+    }
     @GetMapping("/get-top-music")
     public ApiResponse<List<MusicResponse>> getTopMusic() {
         List<MusicResponse> list = musicService.getTopMusics();
