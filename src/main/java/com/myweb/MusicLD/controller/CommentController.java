@@ -20,8 +20,18 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
+    @GetMapping("/get-all-root")
+    public ApiResponse<List<CommentResponse>> getComments() {
+        List<CommentResponse> commentResponse = commentService.findAllRoot();
+        return ApiResponse.<List<CommentResponse>>builder().result(commentResponse).build();
+    }
+    @GetMapping("/get-all-by-root")
+    public ApiResponse<List<CommentResponse>> getComments(@RequestParam(value = "commentId") String commentId) {
+        List<CommentResponse> commentResponse = commentService.getAllCommentsByParent(BigInteger.valueOf(Long.parseLong(commentId)));
+        return ApiResponse.<List<CommentResponse>>builder().result(commentResponse).build();
+    }
     @GetMapping("/get-all-by-music")
-    public ApiResponse<List<CommentResponse>> getComments(@RequestParam(value = "id") String musicId) {
+    public ApiResponse<List<CommentResponse>> getCommentsByMusic(@RequestParam(value = "id") String musicId) {
         List<CommentResponse> commentResponse = commentService.findByMusic(BigInteger.valueOf(Long.parseLong(musicId)));
         return ApiResponse.<List<CommentResponse>>builder().result(commentResponse).build();
     }

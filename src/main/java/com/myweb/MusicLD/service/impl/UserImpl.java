@@ -186,6 +186,9 @@ public class UserImpl implements UserService {
         if (userRequest.getPassword() != null) {
             userEntity.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
+        if(userRequest.getStatus() != null){
+            userEntity.getMusics().forEach(music -> musicService.updateStatusMusic(music.getId(), userRequest.getStatus()));
+        }
         UserEntity user = userRepository.save(userEntity);
         return modelMapper.map(user, UserResponse.class);
     }

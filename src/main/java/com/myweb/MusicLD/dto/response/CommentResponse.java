@@ -17,4 +17,6 @@ public class CommentResponse {
     private UserResponse userResponse;
     private BigInteger parentId;
     private LocalDateTime createdDate;
+    private String titleMusic;
+    private BigInteger musicId;
 }

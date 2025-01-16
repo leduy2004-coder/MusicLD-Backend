@@ -17,9 +17,11 @@ import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +34,12 @@ public class CommentImpl implements CommentService {
     private final MusicService musicService;
     private final ModelMapper modelMapper;
     private final AvatarService avatarService;
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @Override
+    public List<CommentResponse> findAllRoot() {
+        return commentRepository.findByParentCommentIsNull().stream().map(this::getCommentResponse).toList();
+    }
 
     @Override
     public List<CommentResponse> findByMusic(BigInteger musicId) {
@@ -60,17 +68,6 @@ public class CommentImpl implements CommentService {
         return getCommentResponse(entity);
     }
 
-    private CommentResponse getCommentResponse(CommentEntity entity) {
-        UserResponse userResponse = modelMapper.map(entity.getUserEntity(), UserResponse.class);
-        userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true, AvatarType.USER));
-        return CommentResponse.builder()
-                .id(entity.getId())
-                .createdDate(entity.getCreatedDate())
-                .content(entity.getContent())
-                .parentId(entity.getParentComment() != null ? entity.getParentComment().getId() : null)
-                .userResponse(userResponse)
-                .build();
-    }
 
     @Override
     public CommentResponse update(CommentRequest commentRequest) {
@@ -87,11 +84,46 @@ public class CommentImpl implements CommentService {
     @Override
     public Boolean delete(BigInteger id) {
         try {
-            commentRepository.deleteById(id);
+            getAllCommentsByParent(id).forEach(commentResponse -> {
+                commentRepository.deleteById(commentResponse.getId());
+            });
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
     }
 
+    @Override
+    public List<CommentResponse> getAllCommentsByParent(BigInteger id) {
+        CommentEntity comment = commentRepository.findById(id).orElse(null);
+        List<CommentEntity> allComments = fetchAllChildComments(comment);
+        allComments.add(comment);
+        return allComments.stream().map(this::getCommentResponse).toList();
+    }
+
+    private List<CommentEntity> fetchAllChildComments(CommentEntity parentComment) {
+        // Lấy các comment con trực tiếp
+        List<CommentEntity> directChildren = commentRepository.findByParentComment(parentComment);
+
+        List<CommentEntity> allChildren = new ArrayList<>(directChildren);
+        for (CommentEntity child : directChildren) {
+            allChildren.addAll(fetchAllChildComments(child));
+        }
+
+        return allChildren;
+    }
+
+    private CommentResponse getCommentResponse(CommentEntity entity) {
+        UserResponse userResponse = modelMapper.map(entity.getUserEntity(), UserResponse.class);
+        userResponse.setAvatar(avatarService.findByStatus(userResponse.getId(), true, AvatarType.USER));
+        return CommentResponse.builder()
+                .id(entity.getId())
+                .createdDate(entity.getCreatedDate())
+                .content(entity.getContent())
+                .parentId(entity.getParentComment() != null ? entity.getParentComment().getId() : null)
+                .userResponse(userResponse)
+                .titleMusic(entity.getMusicEntity().getTitle())
+                .musicId(entity.getMusicEntity().getId())
+                .build();
+    }
 }

@@ -14,4 +14,6 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, BigInteger> {
     List<CommentEntity> findByMusicEntity (MusicEntity musicEntity);
+    List<CommentEntity> findByParentCommentIsNull();
+    List<CommentEntity> findByParentComment(CommentEntity parentComment);
 }

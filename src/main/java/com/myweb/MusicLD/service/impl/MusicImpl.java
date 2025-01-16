@@ -121,9 +121,9 @@ public class MusicImpl implements MusicService {
     }
 
     @Override
-    public Boolean updateStatusMusic(BigInteger id) {
+    public Boolean updateStatusMusic(BigInteger id, Boolean status) {
         avatarService.updatedAvatars(AvatarType.MUSIC, id);
-        musicRepository.updateStatus(id, false);
+        musicRepository.updateStatus(id, status);
         return true;
     }
 
