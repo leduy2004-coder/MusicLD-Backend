@@ -11,6 +11,17 @@ spring:
       host: localhost
       port: 6379
 
+  ai:
+    openai:
+      api-key: ${API_AI_KEY}
+      audio:
+        transcription:
+          options:
+            model: whisper-1
+            response-format: json
+          base-url: https://api.openai.com
+
+
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
     url: ${DATABASE_URL}
@@ -97,5 +108,6 @@ cloudinary:
   cloud-name: ${CLOUD_NAME}
   api-key: ${API_KEY}
   api-secret: ${API_SECRET}
+
 
 
