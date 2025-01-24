@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.config;
 
 import com.myweb.MusicLD.utility.GetInfo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -8,8 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -18,23 +19,17 @@ import java.util.Optional;
 public class JpaAuditingConfig {
 
     @Bean
-    public AuditorAware<BigInteger> auditorProvider() {
+    public AuditorAware<String> auditorProvider() {
         return new AuditorAwareImpl();
     }
-
-    public static class AuditorAwareImpl implements AuditorAware<BigInteger> {
+    @RequiredArgsConstructor
+    public static class AuditorAwareImpl implements AuditorAware<String> {
 
         @Override
-        public Optional<BigInteger> getCurrentAuditor() {
+        public Optional<String> getCurrentAuditor() {
             try {
-                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-                if (authentication == null || !authentication.isAuthenticated() ||
-                        authentication instanceof AnonymousAuthenticationToken) {
-                    return Optional.empty();
-                }else
-                    return Optional.ofNullable(Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getId());
+                return Objects.requireNonNull(GetInfo.getLoggedInUserName()).describeConstable();
             } catch (Exception e) {
-                e.printStackTrace();
                 return Optional.empty();
             }
         }

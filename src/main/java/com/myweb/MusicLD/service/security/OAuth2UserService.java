@@ -1,6 +1,5 @@
 package com.myweb.MusicLD.service.security;
 
-import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.*;
 import com.myweb.MusicLD.entity.AvatarEntity;
@@ -22,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -40,6 +41,7 @@ public class OAuth2UserService {
     private final AvatarRepository avatarRepository;
     private final TokenRedisService tokenRedisService;
     private final UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
     private final GoogleIdentityClient googleIdentityClient;
     private final GoogleUserInfoClient googleUserInfoClient;
     private final FacebookUserInfoClient facebookUserInfoClient;
@@ -172,11 +174,10 @@ public class OAuth2UserService {
     }
 
     public AuthenticationResponse loginOauth2(UserEntity user, AvatarEntity avatarEntity) {
-        CustomUserDetails customUserDetails = new CustomUserDetails();
-        customUserDetails.setUser(user);
-        String accessToken = jwtService.generateToken(customUserDetails);
-        String refreshToken = jwtService.generateRefreshToken(customUserDetails);
-        assert user != null;
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        String accessToken = jwtService.generateToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());

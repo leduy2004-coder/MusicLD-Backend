@@ -31,14 +31,14 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @Column(updatable = false)
-    protected BigInteger createdBy;
+    protected String createdBy;
 
     @CreatedDate
     @Column(updatable = false)
     protected LocalDateTime createdDate;
 
     @LastModifiedBy
-    protected BigInteger modifiedBy;
+    protected String modifiedBy;
 
     @LastModifiedDate
     protected LocalDateTime modifiedDate;

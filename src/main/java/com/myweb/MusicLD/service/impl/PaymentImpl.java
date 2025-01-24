@@ -31,7 +31,7 @@ public class PaymentImpl implements PaymentService {
 
     @Override
     public PaymentResponse createVnPayPayment(HttpServletRequest request) {
-        String userName = Objects.requireNonNull(GetInfo.getLoggedInUserInfo()).getUsername();
+        String userName = GetInfo.getLoggedInUserName();
         long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
         String bankCode = request.getParameter("bankCode");
         Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();

@@ -1,17 +1,20 @@
 package com.myweb.MusicLD.service.impl;
 
 import com.myweb.MusicLD.dto.ChangePassword;
-import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.UserInputDTO;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.RoleResponse;
 import com.myweb.MusicLD.dto.response.StatisticResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
-import com.myweb.MusicLD.entity.*;
+import com.myweb.MusicLD.entity.AvatarEntity;
+import com.myweb.MusicLD.entity.MusicEntity;
+import com.myweb.MusicLD.entity.RoleEntity;
+import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.*;
+import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
@@ -22,14 +25,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,6 +46,7 @@ public class UserImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
     private final FollowerService followerService;
+    private final GetInfo getInfo;
 
     @Override
     public UserEntity insert(UserRequest userRequest) {
@@ -67,14 +68,14 @@ public class UserImpl implements UserService {
         return userRepository.save(userEntity);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public Boolean delete(BigInteger id) {
         try {
             Optional<UserEntity> entity = userRepository.findById(id);
             if (entity.isPresent()) {
                 for (AvatarEntity avatarEntity : entity.get().getAvatars()) {
-                    avatarService.deleteImage(avatarEntity.getPublicId(),AvatarType.USER, id);
+                    avatarService.deleteImage(avatarEntity.getPublicId(), AvatarType.USER, id);
                 }
                 for (MusicEntity music : entity.get().getMusics()) {
                     musicService.deleteMusic(music.getId());
@@ -103,7 +104,7 @@ public class UserImpl implements UserService {
         return userResponse;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserInputDTO findUserForAdminById(BigInteger id) {
         UserEntity user = userRepository.findById(id)
@@ -134,19 +135,28 @@ public class UserImpl implements UserService {
 
     @Override
     @Transactional
-    public void changePassword(ChangePassword request, Principal connectedUser) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-        if (!passwordEncoder.matches(request.getCurrentPassword(), customUserDetails.getPassword())) {
-            throw new IllegalStateException("Wrong password");
+    public Boolean changePassword(ChangePassword request) {
+        UserEntity user = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
+        if (user == null) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_WRONG);
         }
         if (!request.getNewPassword().equals(request.getConfirmationPassword())) {
-            throw new IllegalStateException("Password are not the same");
+            throw new AppException(ErrorCode.PASSWORD_NOT_SAME);
         }
-        customUserDetails.getUser().setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userRepository.save(customUserDetails.getUser());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        try {
+            UserEntity userEntity = userRepository.save(user);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UserResponse> findAll() {
         log.info("In method in admin");
@@ -186,13 +196,12 @@ public class UserImpl implements UserService {
         if (userRequest.getPassword() != null) {
             userEntity.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
-        if(userRequest.getStatus() != null){
+        if (userRequest.getStatus() != userEntity.getStatus() && userRequest.getStatus()) {
             userEntity.getMusics().forEach(music -> musicService.updateStatusMusic(music.getId(), userRequest.getStatus()));
         }
         UserEntity user = userRepository.save(userEntity);
         return modelMapper.map(user, UserResponse.class);
     }
-
 
 
     @Override
@@ -201,7 +210,7 @@ public class UserImpl implements UserService {
         return mapUserEntitiesToResponses(userRepository.getTopUsersByFollowers(pageable, "USER"));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<StatisticResponse> getTopUserByMusic(int year) {
         List<Tuple> list = userRepository.getTopUsersByMusics(year);

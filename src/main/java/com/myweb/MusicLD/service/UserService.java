@@ -8,7 +8,6 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 
 import java.math.BigInteger;
-import java.security.Principal;
 import java.util.List;
 
 public interface UserService {
@@ -17,7 +16,7 @@ public interface UserService {
     UserResponse findById(BigInteger id);
     UserInputDTO findUserForAdminById(BigInteger id);
     UserResponse findByUsername(String userName);
-    void changePassword(ChangePassword request, Principal connectedUser);
+    Boolean changePassword(ChangePassword request);
     List<UserResponse> findAll();
     void updateAuthenticationType(String username, String oauth2ClientName);
     List<UserResponse> searchUsers(String searchString, String type);

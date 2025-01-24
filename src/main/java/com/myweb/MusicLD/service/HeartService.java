@@ -6,6 +6,7 @@ import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 public interface HeartService {
     boolean likeMusic(BigInteger userId, BigInteger musicId);
@@ -13,4 +14,6 @@ public interface HeartService {
     List<UserResponse> findAllByMusic(BigInteger musicId);
     long countLike(BigInteger musicId);
     boolean checkLike(BigInteger userId, BigInteger musicId);
+    Map<BigInteger, Long> countLikesForMusicIds(List<BigInteger> musicIds);
+    Map<BigInteger, Boolean> checkLikesForUser(BigInteger id, List<BigInteger> musicIds);
 }

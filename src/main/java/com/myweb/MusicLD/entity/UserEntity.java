@@ -3,6 +3,7 @@ package com.myweb.MusicLD.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.Date;
@@ -26,6 +27,10 @@ public class UserEntity extends BaseEntity {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "phone_number", length = 20)
+    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Số điện thoại không hợp lệ")
+    private String phoneNumber;
+
     @Column(name = "status")
     private Boolean status;
 
@@ -43,10 +48,9 @@ public class UserEntity extends BaseEntity {
     @JsonManagedReference
     private List<PaymentEntity> payments;
 
-    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY,orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<AvatarEntity> avatars;
-
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

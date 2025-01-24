@@ -1,26 +1,26 @@
 package com.myweb.MusicLD.utility;
 
-import com.myweb.MusicLD.dto.CustomUserDetails;
-import com.myweb.MusicLD.entity.UserEntity;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class GetInfo {
-    private static ModelMapper getMapper() {
-        return new ModelMapper();
-    }
 
-    public static UserEntity getLoggedInUserInfo() {
+    public static String getLoggedInUserName() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() ||
-                authentication instanceof AnonymousAuthenticationToken) {
-            return null;
+
+        // Kiểm tra xem authentication có hợp lệ hay không
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null; // Hoặc ném exception nếu cần
         }
-        ModelMapper mapper = getMapper();
-        if (authentication.getPrincipal() instanceof CustomUserDetails userPrincipal) {
-            return mapper.map(userPrincipal.getUser(), UserEntity.class);
+        // Trường hợp user đã đăng nhập và token là JWT
+        if (authentication instanceof JwtAuthenticationToken jwtAuthenticationToken) {
+            return jwtAuthenticationToken.getName();
         }
         return null;
     }

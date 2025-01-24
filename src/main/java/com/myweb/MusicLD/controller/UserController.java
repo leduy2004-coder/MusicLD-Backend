@@ -33,6 +33,7 @@ public class UserController {
     ) {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
     }
+
     @PostMapping("/add-user")
     public ApiResponse<UserResponse> addUser(
             @RequestBody UserRequest request
@@ -40,6 +41,7 @@ public class UserController {
         UserEntity user = userService.insert(request);
         return ApiResponse.<UserResponse>builder().result(modelMapper.map(user, UserResponse.class)).build();
     }
+
     @GetMapping("/search")
     public ApiResponse<List<UserResponse>> searchUser(@RequestParam(value = "q") String result,
                                                       @RequestParam(value = "type") String type) {
@@ -53,13 +55,12 @@ public class UserController {
         return ApiResponse.<List<UserResponse>>builder().result(list).build();
     }
 
-    @PatchMapping
-    public ResponseEntity<?> changePassword(
-            @RequestBody ChangePassword request,
-            Principal connectedUser
+    @PatchMapping("/change-password")
+    public ApiResponse<Boolean> changePassword(
+            @RequestBody ChangePassword request
     ) {
-        userService.changePassword(request, connectedUser);
-        return ResponseEntity.ok("Change password ok");
+        Boolean status = userService.changePassword(request);
+        return ApiResponse.<Boolean>builder().result(status).build();
     }
 
     @GetMapping("/get-user")
@@ -67,11 +68,13 @@ public class UserController {
         UserResponse userResponse = userService.findById(BigInteger.valueOf(Long.parseLong(id)));
         return ApiResponse.<UserResponse>builder().result(userResponse).build();
     }
+
     @GetMapping("/get-user-for-admin")
     public ApiResponse<UserInputDTO> getUserOfAdmin(@RequestParam(value = "id") String id) {
         UserInputDTO userResponse = userService.findUserForAdminById(BigInteger.valueOf(Long.parseLong(id)));
         return ApiResponse.<UserInputDTO>builder().result(userResponse).build();
     }
+
     @PatchMapping("/update-user")
     public ApiResponse<UserResponse> updateUserPartially(
             @RequestBody UserRequest userRequest) {

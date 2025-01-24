@@ -9,7 +9,6 @@ import com.myweb.MusicLD.repository.jpa.AvatarRepository;
 import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CloudinaryService;
-import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.ImageUtils;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
@@ -39,13 +38,14 @@ public class AvatarImpl implements AvatarService {
         ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
         String fileName = ImageUtils.getFileName(file.getOriginalFilename());
         CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);
+        UserEntity user = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
         if (type.equals(AvatarType.USER)) {
             avatarRepository.save(AvatarEntity.builder()
                     .name(fileName)
                     .url(response.getUrl())
                     .publicId(response.getPublicId())
                     .type(type)
-                    .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
+                    .userEntity(user)
                     .status(true)
                     .build());
         } else {
@@ -55,7 +55,7 @@ public class AvatarImpl implements AvatarService {
                     .publicId(response.getPublicId())
                     .musicEntity(musicEntity)
                     .type(type)
-                    .userEntity(mapper.map(GetInfo.getLoggedInUserInfo(), UserEntity.class))
+                    .userEntity(user)
                     .status(true)
                     .build());
         }
@@ -65,7 +65,7 @@ public class AvatarImpl implements AvatarService {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     @Transactional
     public AvatarResponse uploadImageUser(MultipartFile file, BigInteger id) {
@@ -103,7 +103,7 @@ public class AvatarImpl implements AvatarService {
         return mapper.map(avatarEntity.getLast(), AvatarResponse.class);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public Boolean deleteImage(String publicId, AvatarType type, BigInteger id) {
         updatedAvatars(type, id);

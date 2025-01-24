@@ -1,6 +1,5 @@
 package com.myweb.MusicLD.service.security;
 
-import com.myweb.MusicLD.dto.CustomUserDetails;
 import com.myweb.MusicLD.dto.request.AuthenticationRequest;
 import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
@@ -9,7 +8,6 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
@@ -19,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -28,20 +28,19 @@ import java.math.BigInteger;
 @RequiredArgsConstructor
 public class AuthenticationService {
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private CustomUserDetails customUserDetails = new CustomUserDetails();
-
+    private final UserDetailsService userDetailsService;
     private final ModelMapper modelMapper;
     private final TokenRedisService tokenRedisService;
 
 
     public AuthenticationResponse register(UserRequest request) {
         UserEntity userSaver = userService.insert(request);
-        customUserDetails.setUser(userSaver);
-        var jwtToken = jwtService.generateToken(customUserDetails);
-        var refreshToken = jwtService.generateRefreshToken(customUserDetails);
+        UserDetails user = userDetailsService.loadUserByUsername(userSaver.getUsername());
+
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
         tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
         UserResponse userResponse = modelMapper.map(userSaver, UserResponse.class);
         userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());
@@ -63,13 +62,11 @@ public class AuthenticationService {
                             request.getPassword()
                     )
             );
-            customUserDetails = new CustomUserDetails();
             userResponse = userService.findByUsername(request.getUsername());
-            UserEntity user = userRepository.findByUsername(request.getUsername()).orElse(null);
+            UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
 
-            customUserDetails.setUser(user);
-            jwtToken = jwtService.generateToken(customUserDetails);
-            refreshToken = jwtService.generateRefreshToken(customUserDetails);
+            jwtToken = jwtService.generateToken(user);
+            refreshToken = jwtService.generateRefreshToken(user);
             assert user != null;
             tokenRedisService.saveRefreshToken(user.getUsername(), refreshToken);
 
@@ -98,14 +95,12 @@ public class AuthenticationService {
         userName = jwtService.extractUserName(accessToken);
 
         if (userName != null) {
-            customUserDetails = new CustomUserDetails();
-            UserEntity user = userRepository.findByUsername(userName).orElse(null);
-            customUserDetails.setUser(user);
+            UserDetails user = userDetailsService.loadUserByUsername(userName);
 
             String refreshToken = tokenRedisService.getRefreshToken(userName);
             if (refreshToken == null) throw new AppException(ErrorCode.RE_TOKEN_EXPIRED);
-            String newAccessToken = jwtService.generateToken(customUserDetails);
-            String newRefreshToken = jwtService.generateRefreshToken(customUserDetails);
+            String newAccessToken = jwtService.generateToken(user);
+            String newRefreshToken = jwtService.generateRefreshToken(user);
             assert user != null;
             tokenRedisService.saveRefreshToken(user.getUsername(), newRefreshToken);
 

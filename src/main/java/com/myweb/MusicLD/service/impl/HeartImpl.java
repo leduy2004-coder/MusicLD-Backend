@@ -1,9 +1,5 @@
 package com.myweb.MusicLD.service.impl;
 
-import com.myweb.MusicLD.dto.request.MusicRequest;
-import com.myweb.MusicLD.dto.response.AvatarResponse;
-import com.myweb.MusicLD.dto.response.CloudinaryResponse;
-import com.myweb.MusicLD.dto.response.MusicResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.HeartEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
@@ -12,30 +8,15 @@ import com.myweb.MusicLD.repository.jpa.HeartRepository;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
 import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
-import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.service.HeartService;
-import com.myweb.MusicLD.service.MusicService;
-import com.myweb.MusicLD.utility.GetInfo;
-import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.tritonus.share.sampled.file.TAudioFileFormat;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,7 +52,8 @@ public class HeartImpl implements HeartService {
         }
         return false;
     }
-    @PreAuthorize("hasAuthority('ADMIN')")
+
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UserResponse> findAllByMusic(BigInteger musicId) {
         List<HeartEntity> likes = heartRepository.findByMusicId(musicId);
@@ -92,5 +74,30 @@ public class HeartImpl implements HeartService {
     @Override
     public boolean checkLike(BigInteger userId, BigInteger musicId) {
         return heartRepository.existsByUserIdAndMusicId(userId, musicId);
+    }
+
+    @Override
+    public Map<BigInteger, Long> countLikesForMusicIds(List<BigInteger> musicIds) {
+        List<Object[]> results = heartRepository.countLikesForMusicIds(musicIds);
+        return results.stream()
+                .collect(Collectors.toMap(
+                        row -> (BigInteger) row[0],  // id
+                        row -> (Long) row[1]         // count
+                ));
+    }
+
+    @Override
+    public Map<BigInteger, Boolean> checkLikesForUser(BigInteger userId, List<BigInteger> musicIds) {
+        List<BigInteger> likedMusicIds = heartRepository.findLikedMusicIdsForUser(userId, musicIds);
+
+        // Kiểm tra sự trùng lặp hoặc lỗi
+        Set<BigInteger> uniqueLikedMusicIds = new HashSet<>(likedMusicIds); // Loại bỏ trùng lặp
+
+        // Xây dựng Map với trạng thái 'liked' (true/false) cho từng bài hát
+        return musicIds.stream()
+                .collect(Collectors.toMap(
+                        musicId -> musicId,
+                        uniqueLikedMusicIds::contains
+                ));
     }
 }

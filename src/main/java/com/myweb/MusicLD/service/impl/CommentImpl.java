@@ -5,10 +5,12 @@ import com.myweb.MusicLD.dto.response.CommentResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.CommentEntity;
 import com.myweb.MusicLD.entity.MusicEntity;
+import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.jpa.CommentRepository;
 import com.myweb.MusicLD.repository.jpa.MusicRepository;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.CommentService;
 import com.myweb.MusicLD.service.MusicService;
@@ -23,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +32,11 @@ public class CommentImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final MusicRepository musicRepository;
-    private final MusicService musicService;
+    private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final AvatarService avatarService;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<CommentResponse> findAllRoot() {
         return commentRepository.findByParentCommentIsNull().stream().map(this::getCommentResponse).toList();
@@ -57,7 +58,9 @@ public class CommentImpl implements CommentService {
     @Override
     public CommentResponse insert(CommentRequest commentRequest) {
         CommentEntity entity = modelMapper.map(commentRequest, CommentEntity.class);
-        entity.setUserEntity(GetInfo.getLoggedInUserInfo());
+        UserEntity user = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
+
+        entity.setUserEntity(user);
         MusicEntity music = musicRepository.findById(commentRequest.getMusicId()).orElse(null);
         entity.setMusicEntity(music);
         if (commentRequest.getParentId() != null) {

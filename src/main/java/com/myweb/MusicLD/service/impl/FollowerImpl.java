@@ -28,11 +28,13 @@ public class FollowerImpl implements FollowerService {
     private final FollowerRepository followerRepository;
     private final ModelMapper modelMapper;
     private final AvatarService avatarService;
+    private final GetInfo getInfo;
 
     @Override
     @Transactional
     public RequestFollowStatus updateRequestFollow(BigInteger followedId, RequestFollowStatus status) {
-        UserEntity follower = GetInfo.getLoggedInUserInfo();
+
+        UserEntity follower = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
         UserEntity followed = userRepository.findById(followedId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if (getFollowStatus(follower,followed) == null && status != RequestFollowStatus.ACCEPTED) {
@@ -57,7 +59,7 @@ public class FollowerImpl implements FollowerService {
 
     @Override
     public RequestFollowStatus getStatus(BigInteger followedId) {
-        UserEntity follower = GetInfo.getLoggedInUserInfo();
+        UserEntity follower = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
         UserEntity followed = userRepository.findById(followedId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         if (getFollowStatus(follower,followed) == null) {
@@ -97,7 +99,7 @@ public class FollowerImpl implements FollowerService {
 
     @Override
     public Boolean checkFollow(BigInteger id) {
-        UserEntity follower = GetInfo.getLoggedInUserInfo();
+        UserEntity follower = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
         UserEntity followed = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return getFollowStatus(follower,followed) ==  RequestFollowStatus.ACCEPTED;
