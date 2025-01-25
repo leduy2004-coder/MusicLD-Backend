@@ -1,6 +1,5 @@
-package com.myweb.MusicLD.service.impl;
+package com.myweb.MusicLD.service.redis;
 
-import com.myweb.MusicLD.service.BaseRedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;

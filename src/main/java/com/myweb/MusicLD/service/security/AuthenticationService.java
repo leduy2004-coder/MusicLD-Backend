@@ -8,7 +8,7 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.service.TokenRedisService;
+import com.myweb.MusicLD.service.redis.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
 import jakarta.servlet.http.HttpServletRequest;

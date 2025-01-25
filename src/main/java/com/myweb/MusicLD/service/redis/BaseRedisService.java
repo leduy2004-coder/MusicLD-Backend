@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service;
+package com.myweb.MusicLD.service.redis;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

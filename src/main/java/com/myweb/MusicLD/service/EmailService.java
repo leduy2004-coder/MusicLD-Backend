@@ -7,9 +7,9 @@ public interface EmailService {
 
     String generateOtp();
 
-    void sendOtp(String email);
+    void sendOtp(String email, String type);
 
-    boolean checkOTP(String otp, String email);
+    boolean checkOTP(String otp, String email, String type);
 
 
 }

@@ -1,6 +1,6 @@
 package com.myweb.MusicLD.service.impl;
 
-import com.myweb.MusicLD.service.TokenRedisService;
+import com.myweb.MusicLD.service.redis.TokenRedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

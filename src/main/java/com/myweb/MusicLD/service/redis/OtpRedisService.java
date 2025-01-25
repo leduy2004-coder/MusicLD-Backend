@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.service;
+package com.myweb.MusicLD.service.redis;
 
 public interface OtpRedisService extends BaseRedisService<String,String,String>{
     void clearByEmail(String email);

@@ -12,7 +12,7 @@ import com.myweb.MusicLD.repository.feignClient.FacebookUserInfoClient;
 import com.myweb.MusicLD.repository.feignClient.GoogleIdentityClient;
 import com.myweb.MusicLD.repository.feignClient.GoogleUserInfoClient;
 import com.myweb.MusicLD.service.AvatarService;
-import com.myweb.MusicLD.service.TokenRedisService;
+import com.myweb.MusicLD.service.redis.TokenRedisService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;

@@ -29,4 +29,5 @@ public class UserResponse{
     private List<CommentResponse> musicResponses;
     private long countFollower;
     private boolean status;
+    private String email;
 }

@@ -1,6 +1,4 @@
-package com.myweb.MusicLD.service;
-
-import java.util.Map;
+package com.myweb.MusicLD.service.redis;
 
 public interface TokenRedisService extends BaseRedisService<String,String,String>{
     void clearByUserName(String userName);

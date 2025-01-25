@@ -1,10 +1,13 @@
 package com.myweb.MusicLD.service.impl;
 
 
+import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.EmailService;
-import com.myweb.MusicLD.service.OtpRedisService;
+import com.myweb.MusicLD.service.redis.OtpRedisService;
+import com.myweb.MusicLD.service.redis.VerifyRedisService;
+import com.myweb.MusicLD.utility.GetInfo;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,7 @@ public class EmailImpl implements EmailService {
     private String fromEmail;
 
     private final OtpRedisService otpRedisService;
+    private final VerifyRedisService verifyRedisService;
     private final JavaMailSender javaMailSender;
 
     @Override
@@ -73,7 +77,7 @@ public class EmailImpl implements EmailService {
     }
 
     @Override
-    public void sendOtp(String email) {
+    public void sendOtp(String email, String type) {
         String otp = generateOtp();
         String subject = "Mã xác thực OTP của bạn";
         String body = String.format(
@@ -89,26 +93,51 @@ public class EmailImpl implements EmailService {
                         """,
                 otp
         );
+
         sendEmail(null, email, null, subject, body);
         // Kiểm tra và xóa OTP cũ nếu tồn tại
-        String existingOtp = otpRedisService.getOTP(email);
-        if (existingOtp != null) {
-            otpRedisService.clearByEmail(email);
+        if(type.equals("CHANGE-PASSWORD")){
+            String userName = GetInfo.getLoggedInUserName();
+            String existingOtp = verifyRedisService.getVerify(userName);
+            if (existingOtp != null) {
+                verifyRedisService.clearByVerify(userName);
+            }
+            verifyRedisService.saveVerify(userName, otp);
+        }else {
+            String existingOtp = otpRedisService.getOTP(email);
+            if (existingOtp != null) {
+                otpRedisService.clearByEmail(email);
+            }
+            otpRedisService.saveOTP(email, otp);
         }
-        otpRedisService.saveOTP(email, otp);
+
     }
 
     @Override
-    public boolean checkOTP(String otp, String email) {
-        String savedOtp = otpRedisService.getOTP(email);
+    public boolean checkOTP(String otp, String email, String type) {
+        if(type.equals("CHANGE-PASSWORD")){
+            String userName = GetInfo.getLoggedInUserName();
+            String savedOtp = verifyRedisService.getVerify(userName);
 
-        if (savedOtp == null) {
-            throw new AppException(ErrorCode.OTP_EXPIRED);
+            if (savedOtp == null) {
+                throw new AppException(ErrorCode.OTP_EXPIRED);
+            }
+            if(savedOtp.equals(otp)){
+                verifyRedisService.clearByVerify(email);
+                return true;
+            }
+        }else {
+            String savedOtp = otpRedisService.getOTP(email);
+
+            if (savedOtp == null) {
+                throw new AppException(ErrorCode.OTP_EXPIRED);
+            }
+            if(savedOtp.equals(otp)){
+                otpRedisService.clearByEmail(email);
+                return true;
+            }
         }
-        if(savedOtp.equals(otp)){
-            otpRedisService.clearByEmail(email);
-            return true;
-        }
+
         return false;
     }
 
