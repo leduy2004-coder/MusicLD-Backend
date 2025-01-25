@@ -15,7 +15,7 @@ public class EmailSendController {
 
     private final EmailService emailService;
     @PostMapping("/send")
-    public String sendEmail(@RequestParam(value = "file", required = false)MultipartFile[] file, String to, String cc, String subject, String body){
+    public Boolean sendEmail(@RequestParam(value = "file", required = false)MultipartFile[] file, String to, String cc, String subject, String body){
         return emailService.sendEmail(file,to,cc,subject,body);
     }
 }

@@ -21,6 +21,7 @@ public class UserRequest {
     private String password;
     private Boolean status;
     private String nickName;
+    private String email;
     private Boolean gender;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date dateOfBirth;

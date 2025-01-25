@@ -8,15 +8,14 @@ import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
+import com.myweb.MusicLD.service.EmailService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.security.AuthenticationService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.security.Principal;
 import java.util.List;
 
 @AllArgsConstructor
@@ -26,12 +25,26 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationService service;
     private final ModelMapper modelMapper;
+    private final EmailService emailService;
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(
             @RequestBody UserRequest request
     ) {
         return ApiResponse.<AuthenticationResponse>builder().result(service.register(request)).build();
+    }
+
+    @PostMapping("/verify-account")
+    public ApiResponse<Boolean> verifyAccount(@RequestParam(value = "email") String email,
+                                              @RequestParam(value = "otp") String otp) {
+        Boolean check = emailService.checkOTP(otp, email);
+        return ApiResponse.<Boolean>builder().result(check).build();
+    }
+
+    @PostMapping("/generate-otp")
+    public ApiResponse<Boolean> generateOtp(@RequestParam(value = "email") String email) {
+        emailService.sendOtp(email);
+        return ApiResponse.<Boolean>builder().result(true).build();
     }
 
     @PostMapping("/add-user")

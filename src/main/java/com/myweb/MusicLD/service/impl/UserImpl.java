@@ -46,7 +46,6 @@ public class UserImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
     private final FollowerService followerService;
-    private final GetInfo getInfo;
 
     @Override
     public UserEntity insert(UserRequest userRequest) {
@@ -67,6 +66,7 @@ public class UserImpl implements UserService {
         userEntity.setStatus(true);
         return userRepository.save(userEntity);
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override

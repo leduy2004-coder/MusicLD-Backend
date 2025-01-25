@@ -11,8 +11,8 @@ public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(1001, "Uncategorized error", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1002, "User existed", HttpStatus.BAD_REQUEST),
-    PASSWORD_WRONG(10017, "Incorrect current password", HttpStatus.BAD_REQUEST),
-    PASSWORD_NOT_SAME(10018, "New password and confirmation password do not match", HttpStatus.BAD_REQUEST),
+    PASSWORD_WRONG(1017, "Incorrect current password", HttpStatus.BAD_REQUEST),
+    PASSWORD_NOT_SAME(1018, "New password and confirmation password do not match", HttpStatus.BAD_REQUEST),
     MUSIC_NOT_EXISTED(1002, "Music not existed", HttpStatus.BAD_REQUEST),
     COMMENT_NOT_EXISTED(1002, "Music not existed", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1003, "Username must be at least {min} characters", HttpStatus.BAD_REQUEST),
@@ -29,6 +29,7 @@ public enum ErrorCode {
     INVALID_FILE_EXTENSION(1014, "Invalid file extension. Allowed extensions are jpg, png, gif, bmp", HttpStatus.BAD_REQUEST), // 400
     ALREADY_FOLLOWING(1015, "Already followed", HttpStatus.BAD_REQUEST),
     NOT_FOLLOWING(1016, "Unfollowed", HttpStatus.BAD_REQUEST),
+    OTP_EXPIRED(1019, "Expired OTP", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

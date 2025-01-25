@@ -27,9 +27,8 @@ public class UserEntity extends BaseEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "phone_number", length = 20)
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Số điện thoại không hợp lệ")
-    private String phoneNumber;
+
+    private String email;
 
     @Column(name = "status")
     private Boolean status;
