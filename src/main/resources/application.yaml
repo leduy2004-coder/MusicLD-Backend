@@ -4,6 +4,8 @@ gemini:
     key: ${GEMINI_API_KEY}
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   servlet:
     multipart:
       max-file-size: 20MB
@@ -12,8 +14,11 @@ spring:
     type: redis
   data:
     redis:
+      repositories:
+        enabled: false #Tat tu dong gan repository trong redis
       host: localhost
       port: 6379
+
 
   #  ai:
   #    openai:
@@ -28,15 +33,15 @@ spring:
 
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    url: ${DATABASE_URL}
+    url: jdbc:sqlserver://${DATABASE_URL}:${DATABASE_PORT};databaseName=MusicLD;encrypt=true;trustServerCertificate=true;
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
 
     hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
-      idle-timeout: 30000
-      max-lifetime: 1800000
+      minimum-idle: 10         # Đảm bảo có đủ kết nối tối thiểu
+      maximum-pool-size: 30    # Tăng số kết nối tối đa nếu cần thiết
+      idle-timeout: 30000      # Thời gian chờ kết nối không sử dụng trước khi đóng
+      max-lifetime: 1800000    # Thời gian tối đa mỗi kết nối sống
 
   jpa:
     hibernate:
@@ -45,6 +50,8 @@ spring:
       hibernate:
         format_sql: true
     defer-datasource-initialization: true
+    open-in-view: false
+    database-platform: org.hibernate.dialect.SQLServer2012Dialect
 
   application:
     security:
@@ -56,7 +63,7 @@ spring:
 
   security:
     oauth2:
-      resourceserver:
+      resource server:
         jwt:
           issuer-uri: http://localhost:8080/issuer
       client:
@@ -76,7 +83,6 @@ spring:
             scope:
               - email
               - public_profile
-
 
   mail:
     host: smtp.gmail.com

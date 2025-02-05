@@ -1,0 +1,19 @@
+# Chọn image SQL Server cho Ubuntu
+FROM mcr.microsoft.com/mssql/server:2019-CU13-ubuntu-20.04
+
+# Tạo thư mục làm việc
+WORKDIR /usr/src/app
+
+# Copy các script khởi tạo vào container
+COPY ./Db /usr/src/app
+
+# Đặt các biến môi trường cần thiết cho SQL Server
+ENV SA_PASSWORD=Ad123456@123
+ENV ACCEPT_EULA=Y
+ENV MSSQL_PID=Express
+
+# Mở port 1433 để kết nối đến SQL Server từ các container khác
+EXPOSE 1433
+
+# Chạy SQL Server và script khởi tạo
+CMD /bin/bash ./entrypoint.sh

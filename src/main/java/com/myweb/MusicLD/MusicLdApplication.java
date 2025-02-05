@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableFeignClients // Kích hoạt Feign Clients
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "com.myweb.MusicLD.repository.jpa")
 public class MusicLdApplication {
 
 	public static void main(String[] args) {

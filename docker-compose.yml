@@ -1,16 +1,45 @@
-version: "3.9"
+version: '3.9'
 
 services:
-  musicLd-service:
-    container_name: musicLd-container
+  music_ld-service:
+    container_name: music_ld-container
     restart: always
+    env_file:
+      - .env
     build:
-      context: ./
-      dockerfile: Dockerfile
-#    env_file:
-#      - local.env
+      context: .
+      dockerfile: Dockerfile # Dockerfile của ứng dụng Java
     ports:
       - '8081:8080'
+    networks:
+      - backend
+    depends_on:
+      - sqlserver
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis_service
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  sqlserver:
+    build:
+      context: .
+      dockerfile: Db/Dockerfile.sqlserver
+    container_name: sqlserver_service
+    restart: always
+    ports:
+      - "1434:1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Ad123456@123
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "1433" ]
+      interval: 30s
+      retries: 3
     networks:
       - backend
 

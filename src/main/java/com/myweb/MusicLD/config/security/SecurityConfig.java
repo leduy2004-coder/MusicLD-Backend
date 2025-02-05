@@ -38,7 +38,6 @@ public class SecurityConfig {
     };
 
     //    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
 
     @Bean
@@ -58,7 +57,6 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider)
                 .logout(logout ->
                         logout.logoutUrl("/api/auth/logout")
                                 .addLogoutHandler(logoutHandler)
