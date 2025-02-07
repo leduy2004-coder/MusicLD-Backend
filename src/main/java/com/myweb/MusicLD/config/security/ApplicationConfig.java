@@ -87,9 +87,10 @@ public class ApplicationConfig {
         return username -> {
             UserEntity userEntity = repository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            String password = userEntity.getPassword() != null ? userEntity.getPassword() : "OAUTH2_USER";
             return new User(
                     userEntity.getUsername(),
-                    userEntity.getPassword(),
+                    password,
                     mapRolesToAuthorities(userEntity.getRoles())) {
             };
         };

@@ -57,7 +57,7 @@ public class MusicController {
         return ApiResponse.<MusicResponse>builder().result(musicService.uploadMusic(request)).build();
     }
     @PostMapping("/update-status")
-    public ApiResponse<Boolean> deleteImage(@RequestBody MusicRequest.MusicRequestDelete request) {
+    public ApiResponse<Boolean> updateStatusMusic(@RequestBody MusicRequest.MusicRequestDelete request) {
         return ApiResponse.<Boolean>builder().result(musicService.updateStatusMusic( request.getId(), false)).build();
     }
 

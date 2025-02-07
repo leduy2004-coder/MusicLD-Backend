@@ -1,14 +1,17 @@
 package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.dto.response.StatisticResponse;
+import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -16,7 +19,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, BigInteger> {
-    @Query("SELECT u from UserEntity u WHERE u.username = ?1")
+
+    @EntityGraph(attributePaths = {"musics", "avatars"})
+    Optional<UserEntity> findById(BigInteger id);
+
+    @EntityGraph(attributePaths = {"roles"})
     Optional<UserEntity> findByUsername(String username);
 
     @Query("UPDATE UserEntity u SET u.authType = ?2 WHERE u.username = ?1")

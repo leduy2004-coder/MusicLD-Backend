@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -55,6 +56,7 @@ public class HeartImpl implements HeartService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
+//    @Transactional(readOnly = true)
     public List<UserResponse> findAllByMusic(BigInteger musicId) {
         List<HeartEntity> likes = heartRepository.findByMusicId(musicId);
         return likes.stream()

@@ -4,6 +4,7 @@ import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,9 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MusicRepository extends JpaRepository<MusicEntity, BigInteger> {
+
+    @EntityGraph(attributePaths = {"userEntity", "avatars"})
+    Optional<MusicEntity> findById(BigInteger id);
 
     @Query("SELECT a from MusicEntity a WHERE a.status = ?2 and a.userEntity.id=?1")
     List<MusicEntity> findByStatusAndMusic(BigInteger id, Boolean status);

@@ -31,7 +31,6 @@ public class FollowerImpl implements FollowerService {
     private final GetInfo getInfo;
 
     @Override
-    @Transactional
     public RequestFollowStatus updateRequestFollow(BigInteger followedId, RequestFollowStatus status) {
 
         UserEntity follower = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);

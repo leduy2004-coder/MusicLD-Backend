@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,13 @@ public class AvatarImpl implements AvatarService {
     @Override
     @Transactional
     public AvatarResponse uploadImage(MultipartFile file, AvatarType type, MusicEntity musicEntity) {
-        updatedAvatars(type, musicEntity.getId());
+        BigInteger id;
+        if(type.equals(AvatarType.USER)){
+            id = Objects.requireNonNull(userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null)).getId();
+        }else {
+            id = musicEntity.getId();
+        }
+        updatedAvatars(type, id);
         ImageUtils.assertAllowed(file, ImageUtils.IMAGE_PATTERN);
         String fileName = ImageUtils.getFileName(file.getOriginalFilename());
         CloudinaryResponse response = cloudinaryService.uploadFile(file, fileName);

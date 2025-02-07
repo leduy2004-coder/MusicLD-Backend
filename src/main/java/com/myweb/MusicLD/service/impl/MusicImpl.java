@@ -56,7 +56,6 @@ public class MusicImpl implements MusicService {
             user = userRepository.findById(musicRequest.getUserId()).orElse(null);
         } else {
             user = userRepository.findByUsername(GetInfo.getLoggedInUserName()).orElse(null);
-            ;
         }
         AccessMusic accessMusic = parseAccessMusic(musicRequest.getAccessMusic());
         CloudinaryResponse response = cloudinaryService.uploadFile(musicRequest.getFileMusic(), UUID.randomUUID().toString());
@@ -208,7 +207,7 @@ public class MusicImpl implements MusicService {
                     musicResponse.setUserAvatarResponse(
                             avatarService.findByStatus(musicResponse.getIdUser(), true, AvatarType.USER)
                     );
-                    musicResponse.setNickName(musicEntity.getUserEntity().getNickName());
+                    musicResponse.setNickName(Objects.requireNonNull(userRepository.findById(musicResponse.getIdUser()).orElse(null)).getNickName());
                     musicResponse.setCountLike(likesCountMap.getOrDefault(musicResponse.getId(), 0L));
                     musicResponse.setLike(userLikesMap.getOrDefault(musicResponse.getId(), false));
                     musicResponse.setAvatarResponse(

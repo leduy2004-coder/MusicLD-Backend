@@ -6,6 +6,11 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      - REDIS_HOST=redis_service
+      - REDIS_PORT=6379
+      - DATABASE_PASSWORD=Ad123456@123
+      - DATABASE_URL=sqlserver
     build:
       context: .
       dockerfile: Dockerfile # Dockerfile của ứng dụng Java
@@ -20,6 +25,7 @@ services:
   redis:
     image: redis:latest
     container_name: redis_service
+    restart: always
     ports:
       - "6379:6379"
     networks:

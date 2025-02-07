@@ -120,7 +120,6 @@ public class UserImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserResponse findByUsername(String userName) {
         UserEntity user = userRepository.findByUsername(userName)
                 .orElse(null);

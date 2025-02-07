@@ -15,9 +15,10 @@ spring:
   data:
     redis:
       repositories:
-        enabled: false #Tat tu dong gan repository trong redis
-      host: localhost
-      port: 6379
+        enabled: false
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
 
 
   #  ai:
@@ -51,7 +52,6 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
     open-in-view: false
-    database-platform: org.hibernate.dialect.SQLServer2012Dialect
 
   application:
     security:

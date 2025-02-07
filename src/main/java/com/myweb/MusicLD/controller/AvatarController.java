@@ -30,12 +30,12 @@ public class AvatarController {
         return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
     }
     @PostMapping("/upload-user")
-    public ApiResponse<AvatarResponse> User(@RequestParam("image")MultipartFile file, @RequestParam("userId")BigInteger userId) {
+    public ApiResponse<AvatarResponse> uploadImageUser(@RequestParam("image")MultipartFile file, @RequestParam("userId")BigInteger userId) {
         AvatarResponse avatarResponse = avatarService.uploadImageUser(file,  userId);
         return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
     }
     @PostMapping("/delete")
-    public ApiResponse<Boolean> deleteImage(@RequestParam("publicId") String publicId) {
+    public ApiResponse<Boolean> updateStatus(@RequestParam(value = "publicId", required = false) String publicId) {
         UserResponse userResponse = userService.findByUsername(GetInfo.getLoggedInUserName());
         BigInteger userId = userResponse.getId();
         return ApiResponse.<Boolean>builder().result(avatarService.deleteImage(publicId, AvatarType.USER,userId)).build();
