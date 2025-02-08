@@ -117,7 +117,7 @@ public class MusicImpl implements MusicService {
         assert music != null;
         cloudinaryService.deleteFile(music.getPublicId(), "video");
         for (AvatarEntity avatarEntity : music.getAvatars()) {
-            avatarService.deleteImage(avatarEntity.getPublicId(), AvatarType.MUSIC, music.getId());
+            avatarService.deleteImage(avatarEntity.getPublicId(), avatarEntity.getId());
         }
         musicRepository.deleteById(music.getId());
         return true;
@@ -144,7 +144,7 @@ public class MusicImpl implements MusicService {
         musicRepository.save(music);
         MusicResponse musicResponse = mapper.map(music, MusicResponse.class);
         if (musicRequest.getFileAvatar() != null) {
-            avatarService.deleteImage(musicRequest.getPublicIdAvatar(), AvatarType.MUSIC, musicRequest.getId());
+            avatarService.updatedAvatars(AvatarType.MUSIC, musicRequest.getId());
             musicResponse.setAvatarResponse(avatarService.uploadImage(musicRequest.getFileAvatar(), AvatarType.MUSIC, music));
         }
         return musicResponse;

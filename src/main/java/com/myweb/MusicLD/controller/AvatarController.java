@@ -34,10 +34,11 @@ public class AvatarController {
         AvatarResponse avatarResponse = avatarService.uploadImageUser(file,  userId);
         return ApiResponse.<AvatarResponse>builder().result(avatarResponse).build();
     }
-    @PostMapping("/delete")
+    @PostMapping("/update-status")
     public ApiResponse<Boolean> updateStatus(@RequestParam(value = "publicId", required = false) String publicId) {
         UserResponse userResponse = userService.findByUsername(GetInfo.getLoggedInUserName());
         BigInteger userId = userResponse.getId();
-        return ApiResponse.<Boolean>builder().result(avatarService.deleteImage(publicId, AvatarType.USER,userId)).build();
+        avatarService.updatedAvatars(AvatarType.USER,userId);
+        return ApiResponse.<Boolean>builder().result(true).build();
     }
 }

@@ -112,10 +112,9 @@ public class AvatarImpl implements AvatarService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public Boolean deleteImage(String publicId, AvatarType type, BigInteger id) {
-        updatedAvatars(type, id);
+    public void deleteImage(String publicId, BigInteger imageId) {
+        avatarRepository.deleteById(imageId);
         cloudinaryService.deleteFile(publicId, "image");
-        return true;
     }
 
     @Override

@@ -13,6 +13,6 @@ public interface AvatarService {
      AvatarResponse uploadImageUser(MultipartFile file, BigInteger id);
 
      AvatarResponse findByStatus(BigInteger id, Boolean status, AvatarType type);
-     Boolean deleteImage(String publicId, AvatarType type, BigInteger id);
+     void deleteImage(String publicId, BigInteger imageId);
      void updatedAvatars(AvatarType type, BigInteger id);
 }
