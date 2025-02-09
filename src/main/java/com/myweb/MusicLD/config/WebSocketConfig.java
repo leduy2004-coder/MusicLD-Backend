@@ -13,7 +13,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000", "http://backend:8080") // Chỉ cho phép 2 nguồn này
+                .setAllowedOrigins("http://localhost:3000", "http://backend:8080", "https://music-ld.vercel.app") // Chỉ cho phép 2 nguồn này
                 .withSockJS();
     }
 
