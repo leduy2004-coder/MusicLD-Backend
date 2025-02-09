@@ -107,7 +107,7 @@ VALUES
     (5, NULL, 5, 90000, GETDATE(), GETDATE(), 'ACB', 'payment_code_5');
 
 
-
+--
 -- CREATE PROCEDURE spStatisticsMusicByYear
 -- @year INT
 -- AS
