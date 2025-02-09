@@ -27,6 +27,7 @@ spring:
 
 
 
+
   #  ai:
   #    openai:
   #      api-key: ${API_AI_KEY}
