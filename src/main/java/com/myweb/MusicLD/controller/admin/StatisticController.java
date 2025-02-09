@@ -1,4 +1,4 @@
-package com.myweb.MusicLD.controller;
+package com.myweb.MusicLD.controller.admin;
 
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.StatisticResponse;

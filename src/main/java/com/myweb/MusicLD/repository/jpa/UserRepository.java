@@ -1,17 +1,15 @@
 package com.myweb.MusicLD.repository.jpa;
 
-import com.myweb.MusicLD.dto.response.StatisticResponse;
-import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.Tuple;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;

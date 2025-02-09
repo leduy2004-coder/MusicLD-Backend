@@ -3,7 +3,6 @@ package com.myweb.MusicLD.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.Date;
@@ -15,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
+//@Document(indexName = "users")
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
 public class UserEntity extends BaseEntity {
 

@@ -13,6 +13,9 @@ spring:
   cache:
     type: redis
   data:
+#    elasticsearch:
+#      repositories:
+#        enabled: false
     redis:
       repositories:
         enabled: false
@@ -100,8 +103,7 @@ spring:
       mode: always
       data-locations: classpath:data.sql
 
-  elasticsearch:
-    uris: http://localhost:9200
+
 
 
 payment:

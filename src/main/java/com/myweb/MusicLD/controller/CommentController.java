@@ -2,11 +2,8 @@ package com.myweb.MusicLD.controller;
 
 
 import com.myweb.MusicLD.dto.request.CommentRequest;
-import com.myweb.MusicLD.dto.request.UserRequest;
 import com.myweb.MusicLD.dto.response.ApiResponse;
-import com.myweb.MusicLD.dto.response.AuthenticationResponse;
 import com.myweb.MusicLD.dto.response.CommentResponse;
-import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;

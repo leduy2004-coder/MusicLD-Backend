@@ -46,6 +46,7 @@ public class UserImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final AvatarService avatarService;
     private final FollowerService followerService;
+//    private final UserSearchRepository userSearchRepository;
 
     @Override
     public UserEntity insert(UserRequest userRequest) {
@@ -176,6 +177,7 @@ public class UserImpl implements UserService {
         if (type.equalsIgnoreCase("less")) {
             Pageable topFive = PageRequest.of(0, 5);
             return mapUserEntitiesToResponses(userRepository.findDistinctByRoles_CodeAndNickNameContainingIgnoreCase("USER", searchString, topFive));
+//            return mapUserEntitiesToResponses(userSearchRepository.searchByNickname( searchString, topFive));
         } else {
             return mapUserEntitiesToResponses(userRepository.searchFullUsers(searchString, "USER"));
         }
