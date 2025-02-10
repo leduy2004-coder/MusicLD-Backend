@@ -1,6 +1,7 @@
 package com.myweb.MusicLD.repository.jpa;
 
 import com.myweb.MusicLD.entity.HeartEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,7 @@ public interface HeartRepository extends JpaRepository<HeartEntity, BigInteger> 
     Optional<HeartEntity> findByUserIdAndMusicId(BigInteger userId, BigInteger musicId);
 
     @Query("SELECT h from  HeartEntity h where h.musicEntity.id = ?1")
+    @EntityGraph(attributePaths = {"userEntity"})
     List<HeartEntity> findByMusicId(BigInteger musicId);
 
     @Query("SELECT count(h) from  HeartEntity h where h.musicEntity.id = ?1")
