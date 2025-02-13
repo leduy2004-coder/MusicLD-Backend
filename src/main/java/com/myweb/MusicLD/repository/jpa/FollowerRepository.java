@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -17,6 +18,7 @@ public interface FollowerRepository extends JpaRepository<FollowerEntity, BigInt
     FollowerEntity findBySenderAndReceiver(UserEntity sender, UserEntity receiver);
 
     @Modifying
+    @Transactional
     @Query("UPDATE FollowerEntity f SET f.status = :status WHERE f.sender.id = :idSender AND f.receiver.id = :idReceiver")
     void updateStatus(@Param("idSender") BigInteger idSender, @Param("idReceiver") BigInteger idReceiver, @Param("status") RequestFollowStatus status);
 
