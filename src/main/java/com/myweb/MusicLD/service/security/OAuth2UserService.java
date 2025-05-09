@@ -41,7 +41,6 @@ public class OAuth2UserService {
     private final AvatarRepository avatarRepository;
     private final TokenRedisService tokenRedisService;
     private final UserRepository userRepository;
-    private final UserDetailsService userDetailsService;
     private final GoogleIdentityClient googleIdentityClient;
     private final GoogleUserInfoClient googleUserInfoClient;
     private final FacebookUserInfoClient facebookUserInfoClient;
@@ -174,12 +173,13 @@ public class OAuth2UserService {
     }
 
     public AuthenticationResponse loginOauth2(UserEntity user, AvatarEntity avatarEntity) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-        String accessToken = jwtService.generateToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         tokenRedisService.saveRefreshToken(user.getUsername(), String.valueOf(refreshToken));
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+
         userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());
         if (avatarEntity.getUrl() != null) {
             userResponse.setAvatar(AvatarResponse.builder()

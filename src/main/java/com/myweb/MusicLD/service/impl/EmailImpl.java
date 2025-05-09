@@ -1,7 +1,6 @@
 package com.myweb.MusicLD.service.impl;
 
 
-import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.EmailService;
@@ -77,7 +76,7 @@ public class EmailImpl implements EmailService {
     }
 
     @Override
-    public void sendOtp(String email, String type) {
+    public void sendOtp(String email, String userId) {
         String otp = generateOtp();
         String subject = "Mã xác thực OTP của bạn";
         String body = String.format(
@@ -96,7 +95,7 @@ public class EmailImpl implements EmailService {
 
         sendEmail(null, email, null, subject, body);
         // Kiểm tra và xóa OTP cũ nếu tồn tại
-        if(type.equals("CHANGE-PASSWORD")){
+        if(userId != null){
             String userName = GetInfo.getLoggedInUserName();
             String existingOtp = verifyRedisService.getVerify(userName);
             if (existingOtp != null) {
@@ -114,8 +113,8 @@ public class EmailImpl implements EmailService {
     }
 
     @Override
-    public boolean checkOTP(String otp, String email, String type) {
-        if(type.equals("CHANGE-PASSWORD")){
+    public boolean checkOTP(String otp, String email, String userId) {
+        if(userId != null){
             String userName = GetInfo.getLoggedInUserName();
             String savedOtp = verifyRedisService.getVerify(userName);
 

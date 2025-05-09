@@ -1,16 +1,18 @@
 package com.myweb.MusicLD.service.impl;
 
+import com.myweb.MusicLD.entity.RoleEntity;
+import com.myweb.MusicLD.entity.UserEntity;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
-
 
 import java.security.Key;
 import java.util.Date;
@@ -32,8 +34,16 @@ public class JwtService {
     @Value("${spring.application.security.jwt.refresh-token.expiration}")
     private long refreshExpiration;
 
-    public String extractUserName(String token){
-        return extractClaim(token, Claims::getSubject);
+    public String extractUserName(String token) {
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (ExpiredJwtException e) {
+            // Xử lý riêng cho token hết hạn
+            return e.getClaims().getSubject(); // Vẫn trả về username từ token hết hạn
+        } catch (JwtException e) {
+            // Xử lý các lỗi JWT khác
+            throw new RuntimeException("Invalid JWT token", e);
+        }
     }
 
     public <T> T extractClaim(String token , Function<Claims, T> claimsResolver) {
@@ -41,28 +51,30 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserEntity userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            UserEntity userDetails
     ) {
         // Thêm quyền vào claim
-        extraClaims.put("roles", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+        extraClaims.put("roles", buildScope(userDetails));
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
-
+    private String buildScope(UserEntity user) {
+        return user.getRoles().stream()
+                .map(RoleEntity::getCode)
+                .collect(Collectors.joining(" "));
+    }
     public String generateRefreshToken(
-            UserDetails userDetails
+            UserEntity userDetails
     ) {
         return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
     private String buildToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails,
+            UserEntity userDetails,
             long expiration
     ) {
         return Jwts

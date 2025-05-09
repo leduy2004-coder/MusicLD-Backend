@@ -8,19 +8,17 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
-import com.myweb.MusicLD.service.redis.TokenRedisService;
+import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.impl.JwtService;
+import com.myweb.MusicLD.service.redis.TokenRedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -30,20 +28,21 @@ import java.math.BigInteger;
 public class AuthenticationService {
     private final JwtService jwtService;
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+
     private final ModelMapper modelMapper;
     private final TokenRedisService tokenRedisService;
+    private final UserRepository userRepository;
 
 
     public AuthenticationResponse register(UserRequest request) {
         UserEntity userSaver = userService.insert(request);
-        UserDetails user = userDetailsService.loadUserByUsername(userSaver.getUsername());
 
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        var jwtToken = jwtService.generateToken(userSaver);
+        var refreshToken = jwtService.generateRefreshToken(userSaver);
         tokenRedisService.saveRefreshToken(userSaver.getUsername(), refreshToken);
+
         UserResponse userResponse = modelMapper.map(userSaver, UserResponse.class);
+
         userResponse.setRoles(RoleResponse.builder().code("USER").name("user").id(BigInteger.valueOf(2)).build());
         return AuthenticationResponse.builder()
                 .userResponse(userResponse)
@@ -57,20 +56,22 @@ public class AuthenticationService {
         var refreshToken = "";
         UserResponse userResponse;
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    )
-            );
-            userResponse = userService.findByUsername(request.getUsername());
-            UserDetails user = userDetailsService.loadUserByUsername(request.getUsername());
+
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            UserEntity user = userRepository.findByUsername(request.getUsername()).orElse(null);
+            assert user != null;
+            boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+            if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
             jwtToken = jwtService.generateToken(user);
             refreshToken = jwtService.generateRefreshToken(user);
-            assert user != null;
+
             tokenRedisService.saveRefreshToken(user.getUsername(), refreshToken);
 
+            userResponse = modelMapper.map(user, UserResponse.class);
+            RoleResponse roleResponse = modelMapper.map(user.getRoles().getFirst(), RoleResponse.class);
+            userResponse.setRoles(roleResponse);
         } catch (Exception e) {
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
         }
@@ -96,7 +97,7 @@ public class AuthenticationService {
         userName = jwtService.extractUserName(accessToken);
 
         if (userName != null) {
-            UserDetails user = userDetailsService.loadUserByUsername(userName);
+            UserEntity user = userRepository.findByUsername(userName).orElse(null);
 
             String refreshToken = tokenRedisService.getRefreshToken(userName);
             if (refreshToken == null) throw new AppException(ErrorCode.RE_TOKEN_EXPIRED);

@@ -37,15 +37,15 @@ public class UserController {
     @PostMapping("/verify-account")
     public ApiResponse<Boolean> verifyAccount(@RequestParam(required = false) String email,
                                               @RequestParam(value = "otp") String otp,
-                                              @RequestParam(value = "type") String type) {
-        Boolean check = emailService.checkOTP(otp, email,type);
+                                              @RequestParam(value = "userId", required = false) String userId) {
+        Boolean check = emailService.checkOTP(otp, email,userId);
         return ApiResponse.<Boolean>builder().result(check).build();
     }
 
     @PostMapping("/generate-otp")
     public ApiResponse<Boolean> generateOtp(@RequestParam(value = "email") String email,
-                                            @RequestParam(value = "type") String type) {
-        emailService.sendOtp(email,type);
+                                            @RequestParam(value = "userId", required = false) String userId) {
+        emailService.sendOtp(email,userId);
         return ApiResponse.<Boolean>builder().result(true).build();
     }
 

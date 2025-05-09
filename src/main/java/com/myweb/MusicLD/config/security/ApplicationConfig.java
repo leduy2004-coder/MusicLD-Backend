@@ -1,11 +1,11 @@
 package com.myweb.MusicLD.config.security;
 
 import com.myweb.MusicLD.config.JpaAuditingConfig;
-import com.myweb.MusicLD.entity.RoleEntity;
-import com.myweb.MusicLD.entity.UserEntity;
-import com.myweb.MusicLD.repository.jpa.UserRepository;
+import com.myweb.MusicLD.exception.AppException;
+import com.myweb.MusicLD.exception.ErrorCode;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nimbusds.jose.util.Base64;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,33 +14,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import javax.crypto.SecretKey;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
     @Value("${spring.application.security.jwt.secret-key}")
     private String secretKey;
-
-    private final UserRepository repository;
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -62,13 +49,18 @@ public class ApplicationConfig {
         return token -> {
             try {
                 return jwtDecoder.decode(token);
+            } catch (ExpiredJwtException e) {
+                // Có thể xử lý riêng cho token hết hạn
+                throw new AppException(ErrorCode.TOKEN_EXPIRED);
+            } catch (JwtException e) {
+                // Các lỗi JWT khác
+                throw new AppException(ErrorCode.TOKEN_INVALID);
             } catch (Exception e) {
-                System.out.println(">>> JWT error: " + e.getMessage());
-                throw e;
+                // Các lỗi không xác định khác
+                throw new AppException(ErrorCode.UNAUTHENTICATED);
             }
         };
     }
-
     @Bean
     public JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(getSecretKey()));
@@ -80,24 +72,6 @@ public class ApplicationConfig {
             throw new IllegalArgumentException("Secret key quá ngắn, cần ít nhất 32 bytes.");
         }
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            UserEntity userEntity = repository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            String password = userEntity.getPassword() != null ? userEntity.getPassword() : "OAUTH2_USER";
-            return new User(
-                    userEntity.getUsername(),
-                    password,
-                    mapRolesToAuthorities(userEntity.getRoles())) {
-            };
-        };
-    }
-
-    private Collection<GrantedAuthority> mapRolesToAuthorities(List<RoleEntity> roles) {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getCode())).collect(Collectors.toList());
     }
 
 
