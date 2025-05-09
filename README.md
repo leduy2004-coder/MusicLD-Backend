@@ -73,8 +73,10 @@ Hỗ trợ xác thực người dùng qua:
 ## 📂 Cài đặt & Chạy dự án (dev)
 
 ```bash
-# Clone repo
-git clone https://github.com/<your-username>/MusicLD.git
+# Clone repo Backend
+git clone https://github.com/leduy2004-coder/MusicLD-Backend.git
+# Clone repo Frontend
+git clone https://github.com/leduy2004-coder/MusicLD-Frontend.git
 
 # Mở bằng IDE yêu thích (IntelliJ, VS Code...)
 
