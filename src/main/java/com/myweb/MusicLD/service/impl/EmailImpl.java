@@ -21,6 +21,7 @@ import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
+
 public class EmailImpl implements EmailService {
 
     @Value("${spring.mail.username}")

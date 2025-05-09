@@ -11,7 +11,9 @@ import com.myweb.MusicLD.entity.UserEntity;
 import com.myweb.MusicLD.service.EmailService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.service.security.AuthenticationService;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +23,12 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/users")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    private final UserService userService;
-    private final AuthenticationService service;
-    private final ModelMapper modelMapper;
-    private final EmailService emailService;
+    UserService userService;
+    AuthenticationService service;
+    ModelMapper modelMapper;
+    EmailService emailService;
 
     @PostMapping("/register")
     public ApiResponse<AuthenticationResponse> register(

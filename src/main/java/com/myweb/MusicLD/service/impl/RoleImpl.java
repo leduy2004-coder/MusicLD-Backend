@@ -7,16 +7,19 @@ import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.repository.jpa.RoleRepository;
 import com.myweb.MusicLD.service.RoleService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoleImpl implements RoleService {
-    private final RoleRepository repository;
-    private final ModelMapper modelMapper;
+    RoleRepository repository;
+    ModelMapper modelMapper;
 
     @Override
     @Transactional

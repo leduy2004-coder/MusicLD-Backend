@@ -19,7 +19,9 @@ import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import jakarta.persistence.Tuple;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,13 +42,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MusicImpl implements MusicService {
-    private final AvatarService avatarService;
-    private final UserRepository userRepository;
-    private final MusicRepository musicRepository;
-    private final ModelMapper mapper;
-    private final CloudinaryService cloudinaryService;
-    private final HeartService heartService;
+    AvatarService avatarService;
+    UserRepository userRepository;
+    MusicRepository musicRepository;
+    ModelMapper mapper;
+    CloudinaryService cloudinaryService;
+    HeartService heartService;
 
     @Override
     @Transactional

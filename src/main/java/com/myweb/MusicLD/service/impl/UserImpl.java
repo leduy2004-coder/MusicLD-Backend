@@ -19,7 +19,9 @@ import com.myweb.MusicLD.utility.TupleMapper;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import jakarta.persistence.Tuple;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
@@ -38,15 +40,16 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserImpl implements UserService {
-    private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
-    private final RoleService roleService;
-    private final MusicService musicService;
-    private final PasswordEncoder passwordEncoder;
-    private final AvatarService avatarService;
-    private final FollowerService followerService;
-//    private final UserSearchRepository userSearchRepository;
+    UserRepository userRepository;
+    ModelMapper modelMapper;
+    RoleService roleService;
+    MusicService musicService;
+    PasswordEncoder passwordEncoder;
+    AvatarService avatarService;
+    FollowerService followerService;
+
 
     @Override
     public UserEntity insert(UserRequest userRequest) {

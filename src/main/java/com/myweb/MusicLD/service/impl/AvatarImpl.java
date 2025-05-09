@@ -12,7 +12,9 @@ import com.myweb.MusicLD.service.CloudinaryService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.ImageUtils;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -25,11 +27,12 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AvatarImpl implements AvatarService {
-    private final AvatarRepository avatarRepository;
-    private final UserRepository userRepository;
-    private final ModelMapper mapper;
-    private final CloudinaryService cloudinaryService;
+    AvatarRepository avatarRepository;
+    UserRepository userRepository;
+    ModelMapper mapper;
+    CloudinaryService cloudinaryService;
 
 
     @Override

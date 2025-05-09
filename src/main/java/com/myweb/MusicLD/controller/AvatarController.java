@@ -8,7 +8,9 @@ import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.UserService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,10 +22,12 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/avatar")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AvatarController {
 
-    private final AvatarService avatarService;
-    private final UserService userService;
+    AvatarService avatarService;
+    UserService userService;
+
     @PostMapping("/upload")
     public ApiResponse<AvatarResponse> uploadImage(@RequestParam("image")MultipartFile file) {
         AvatarResponse avatarResponse = avatarService.uploadImage(file, AvatarType.USER, MusicEntity.builder().build());

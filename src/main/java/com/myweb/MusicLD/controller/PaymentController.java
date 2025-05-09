@@ -7,7 +7,9 @@ import com.myweb.MusicLD.service.PaymentService;
 import com.myweb.MusicLD.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,9 +20,10 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
-    private final PaymentService paymentService;
-    private final UserService userService;
+    PaymentService paymentService;
+    UserService userService;
 
     @GetMapping("/vn-pay")
     public ApiResponse<PaymentResponse> pay(HttpServletRequest request) {

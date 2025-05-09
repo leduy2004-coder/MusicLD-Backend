@@ -2,6 +2,7 @@ package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 
@@ -11,8 +12,9 @@ import java.math.BigInteger;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleResponse {
-    private BigInteger id;
-    private String code;
-    private String name;
+    BigInteger id;
+    String code;
+    String name;
 }

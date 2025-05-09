@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Builder
@@ -12,26 +13,27 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "avatar")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AvatarEntity extends BaseEntity{
-    private String name;
+    String name;
 
     @Enumerated(EnumType.STRING)
-    private AvatarType type;
+    AvatarType type;
 
     @Column(name = "url", length = 2048)
-    private String url;
+    String url;
 
-    private String publicId;
+    String publicId;
 
-    private Boolean status;
+    Boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+    UserEntity userEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "music_id")
-    private MusicEntity musicEntity;
+    MusicEntity musicEntity;
 }

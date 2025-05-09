@@ -7,7 +7,9 @@ import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.entity.MusicEntity;
 import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.service.MusicService;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,10 +21,11 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/music")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MusicController {
 
-    private final MusicService musicService;
-    private final HeartService heartService;
+    MusicService musicService;
+    HeartService heartService;
 
     @GetMapping("/get-all")
     public ApiResponse<List<MusicResponse>> findAll() {

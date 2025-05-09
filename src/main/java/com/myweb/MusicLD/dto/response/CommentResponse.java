@@ -2,6 +2,7 @@ package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -11,12 +12,13 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentResponse {
-    private BigInteger id;
-    private String content;
-    private UserResponse userResponse;
-    private BigInteger parentId;
-    private LocalDateTime createdDate;
-    private String titleMusic;
-    private BigInteger musicId;
+    BigInteger id;
+    String content;
+    UserResponse userResponse;
+    BigInteger parentId;
+    LocalDateTime createdDate;
+    String titleMusic;
+    BigInteger musicId;
 }

@@ -14,7 +14,9 @@ import com.myweb.MusicLD.service.impl.JwtService;
 import com.myweb.MusicLD.service.redis.TokenRedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,13 +27,14 @@ import java.math.BigInteger;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    private final JwtService jwtService;
-    private final UserService userService;
+    JwtService jwtService;
+    UserService userService;
 
-    private final ModelMapper modelMapper;
-    private final TokenRedisService tokenRedisService;
-    private final UserRepository userRepository;
+    ModelMapper modelMapper;
+    TokenRedisService tokenRedisService;
+    UserRepository userRepository;
 
 
     public AuthenticationResponse register(UserRequest request) {

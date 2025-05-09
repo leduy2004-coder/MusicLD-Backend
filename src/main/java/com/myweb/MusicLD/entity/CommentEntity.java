@@ -3,6 +3,7 @@ package com.myweb.MusicLD.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,26 +15,27 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "comment")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentEntity extends BaseEntity{
     @Column(name = "content", nullable = false, length = 500)
-    private String content;
+    String content;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity userEntity;
+    UserEntity userEntity;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "music_id", nullable = false)
-    private MusicEntity musicEntity;
+    MusicEntity musicEntity;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "parent_comment_id")
-    private CommentEntity parentComment;
+    CommentEntity parentComment;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
-    private List<CommentEntity> replies;
+    List<CommentEntity> replies;
 
 }

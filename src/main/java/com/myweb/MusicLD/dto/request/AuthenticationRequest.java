@@ -1,5 +1,6 @@
 package com.myweb.MusicLD.dto.request;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
@@ -7,7 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationRequest {
-    private String username;
-    private String password;
+    String username;
+    String password;
 }

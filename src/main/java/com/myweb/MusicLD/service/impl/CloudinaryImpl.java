@@ -6,7 +6,9 @@ import com.myweb.MusicLD.dto.response.CloudinaryResponse;
 import com.myweb.MusicLD.exception.AppException;
 import com.myweb.MusicLD.exception.ErrorCode;
 import com.myweb.MusicLD.service.CloudinaryService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,9 +16,10 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CloudinaryImpl implements CloudinaryService {
 
-    private final Cloudinary cloudinary;
+    Cloudinary cloudinary;
 
     @Override
     public CloudinaryResponse uploadFile(final MultipartFile file, final String fileName) {

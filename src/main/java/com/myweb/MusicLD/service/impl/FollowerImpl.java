@@ -12,7 +12,9 @@ import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
 import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +25,12 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FollowerImpl implements FollowerService {
-    private final UserRepository userRepository;
-    private final FollowerRepository followerRepository;
-    private final ModelMapper modelMapper;
-    private final AvatarService avatarService;
-    private final GetInfo getInfo;
+    UserRepository userRepository;
+    FollowerRepository followerRepository;
+    ModelMapper modelMapper;
+    AvatarService avatarService;
 
     @Override
     public RequestFollowStatus updateRequestFollow(BigInteger followedId, RequestFollowStatus status) {

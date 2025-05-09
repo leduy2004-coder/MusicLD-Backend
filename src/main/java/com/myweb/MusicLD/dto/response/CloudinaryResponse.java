@@ -1,16 +1,15 @@
 package com.myweb.MusicLD.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CloudinaryResponse {
-    private String publicId;
+   String publicId;
 
-    private String url;
+   String url;
 }

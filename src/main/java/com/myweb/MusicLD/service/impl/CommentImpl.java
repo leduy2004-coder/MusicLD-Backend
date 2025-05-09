@@ -16,7 +16,9 @@ import com.myweb.MusicLD.service.CommentService;
 import com.myweb.MusicLD.service.MusicService;
 import com.myweb.MusicLD.utility.GetInfo;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,13 +30,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentImpl implements CommentService {
 
-    private final CommentRepository commentRepository;
-    private final MusicRepository musicRepository;
-    private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
-    private final AvatarService avatarService;
+    CommentRepository commentRepository;
+    MusicRepository musicRepository;
+    UserRepository userRepository;
+    ModelMapper modelMapper;
+    AvatarService avatarService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override

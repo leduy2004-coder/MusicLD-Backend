@@ -2,6 +2,7 @@ package com.myweb.MusicLD.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -9,13 +10,14 @@ import lombok.*;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentResponse {
-        private String code;
-        private String message;
-        private String paymentUrl;
+        String code;
+        String message;
+        String paymentUrl;
 
-        private Long amount;
-        private String bankCode;
-        private UserResponse userEntity;
+        Long amount;
+        String bankCode;
+        UserResponse userEntity;
 
 }

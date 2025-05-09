@@ -7,7 +7,9 @@ import com.myweb.MusicLD.service.security.OAuth2UserService;
 import com.myweb.MusicLD.service.security.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -15,10 +17,11 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
 
-    private final AuthenticationService service;
-    private final OAuth2UserService oAuth2UserService;
+    AuthenticationService service;
+    OAuth2UserService oAuth2UserService;
 
 
     @PostMapping("/authenticate")

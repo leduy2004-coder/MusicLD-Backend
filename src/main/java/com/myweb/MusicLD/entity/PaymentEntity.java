@@ -3,6 +3,7 @@ package com.myweb.MusicLD.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Builder
 @Getter
@@ -11,16 +12,17 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "payment")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentEntity extends BaseEntity{
 
-    private String code;
+    String code;
 
-    private Long amount;
+    Long amount;
 
-    private String bankCode;
+    String bankCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+    UserEntity userEntity;
 }

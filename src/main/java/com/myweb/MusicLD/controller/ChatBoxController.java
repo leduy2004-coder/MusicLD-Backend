@@ -2,7 +2,9 @@ package com.myweb.MusicLD.controller;
 
 import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.service.ChatBoxService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +16,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chat-box")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatBoxController {
-    private final ChatBoxService chatBoxService;
+    ChatBoxService chatBoxService;
 
 
     @PostMapping("/ask")

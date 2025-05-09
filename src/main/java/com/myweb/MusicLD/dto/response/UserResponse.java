@@ -3,10 +3,8 @@ package com.myweb.MusicLD.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -17,17 +15,18 @@ import java.util.List;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse{
-    private BigInteger id;
+    BigInteger id;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date dateOfBirth;
-    private String nickName;
-    private Boolean gender;
-    private RoleResponse roles;
-    private AvatarResponse avatar;
-    private RequestFollowStatus statusFollower;
-    private List<CommentResponse> musicResponses;
-    private long countFollower;
-    private boolean status;
-    private String email;
+    Date dateOfBirth;
+    String nickName;
+    Boolean gender;
+    RoleResponse roles;
+    AvatarResponse avatar;
+    RequestFollowStatus statusFollower;
+    List<CommentResponse> musicResponses;
+    long countFollower;
+    boolean status;
+    String email;
 }

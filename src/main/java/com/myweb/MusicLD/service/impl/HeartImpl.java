@@ -10,7 +10,9 @@ import com.myweb.MusicLD.repository.jpa.UserRepository;
 import com.myweb.MusicLD.service.AvatarService;
 import com.myweb.MusicLD.service.HeartService;
 import com.myweb.MusicLD.utility.enumUtils.AvatarType;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HeartImpl implements HeartService {
-    private final AvatarService avatarService;
-    private final MusicRepository musicRepository;
-    private final UserRepository userRepository;
-    private final ModelMapper mapper;
-    private final HeartRepository heartRepository;
+    AvatarService avatarService;
+    MusicRepository musicRepository;
+    UserRepository userRepository;
+    ModelMapper mapper;
+    HeartRepository heartRepository;
 
 
     @Override

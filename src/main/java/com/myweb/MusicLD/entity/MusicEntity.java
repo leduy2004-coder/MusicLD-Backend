@@ -6,6 +6,7 @@ import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
@@ -17,37 +18,38 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "music")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MusicEntity extends BaseEntity {
 
     @Column(name = "title", nullable = false, columnDefinition = "NVARCHAR(255)")
-    private String title;
+    String title;
 
     @Column(name = "url")
-    private String url;
+    String url;
 
     @Column(name = "status")
-    private Boolean status;
+    Boolean status;
 
     @Column(name = "lyrics", columnDefinition = "NVARCHAR(MAX)")
-    private String lyrics;
+    String lyrics;
 
-    private String publicId;
+    String publicId;
 
-    private int duration;
+    int duration;
 
     @Enumerated(EnumType.STRING)
-    private AccessMusic access;
+    AccessMusic access;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity userEntity;
+    UserEntity userEntity;
 
     @OneToMany(mappedBy = "musicEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<AvatarEntity> avatars;
+    List<AvatarEntity> avatars;
 
     @OneToMany(mappedBy = "musicEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<CommentEntity> comments;
+    List<CommentEntity> comments;
 }

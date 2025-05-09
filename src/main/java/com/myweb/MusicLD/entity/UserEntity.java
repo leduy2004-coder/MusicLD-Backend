@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 import java.util.List;
@@ -16,40 +17,42 @@ import java.util.List;
 @Builder
 //@Document(indexName = "users")
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username")})
+@FieldDefaults(level = AccessLevel.PRIVATE)
+
 public class UserEntity extends BaseEntity {
 
     @Column(name = "username", nullable = false)
-    private String username;
+    String username;
 
     @Column(name = "nickname", columnDefinition = "NVARCHAR(150)")
-    private String nickName;
+    String nickName;
 
     @Column(name = "password")
-    private String password;
+    String password;
 
 
-    private String email;
+    String email;
 
     @Column(name = "status")
-    private Boolean status;
+    Boolean status;
 
     @Column(name = "dateofbirth")
-    private Date dateOfBirth;
+    Date dateOfBirth;
 
     @Column(name = "gender")
-    private Boolean gender;
+    Boolean gender;
 
     @Enumerated(EnumType.STRING)
-    private AuthenticationType authType;
+    AuthenticationType authType;
 
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
-    private List<PaymentEntity> payments;
+    List<PaymentEntity> payments;
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY,orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<AvatarEntity> avatars;
+    List<AvatarEntity> avatars;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -57,22 +60,22 @@ public class UserEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<RoleEntity> roles;
+    List<RoleEntity> roles;
 
     @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
-    private List<FollowerEntity> following;
+    List<FollowerEntity> following;
 
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
-    private List<FollowerEntity> followers;
+    List<FollowerEntity> followers;
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<MusicEntity> musics;
+    List<MusicEntity> musics;
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
-    private List<CommentEntity> comments;
+    List<CommentEntity> comments;
 
 }

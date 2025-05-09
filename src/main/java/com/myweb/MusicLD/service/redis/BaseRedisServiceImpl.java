@@ -1,6 +1,8 @@
 package com.myweb.MusicLD.service.redis;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -10,9 +12,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BaseRedisServiceImpl<K, F, V> implements BaseRedisService<K, F, V> {
-    private final RedisTemplate<K, V> redisTemplate;
-    private final HashOperations<K, F, V> hashOperations;
+    RedisTemplate<K, V> redisTemplate;
+    HashOperations<K, F, V> hashOperations;
 
     @Override
     public void set(K key, V value) {

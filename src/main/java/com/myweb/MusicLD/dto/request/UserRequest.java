@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myweb.MusicLD.utility.enumUtils.AuthenticationType;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -15,16 +16,17 @@ import java.util.List;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRequest {
-    private BigInteger id;
-    private String username;
-    private String password;
-    private Boolean status;
-    private String nickName;
-    private String email;
-    private Boolean gender;
+    BigInteger id;
+    String username;
+    String password;
+    Boolean status;
+    String nickName;
+    String email;
+    Boolean gender;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date dateOfBirth;
-    private AuthenticationType authType;
-    private List<RoleRequest> roles;
+    Date dateOfBirth;
+    AuthenticationType authType;
+    List<RoleRequest> roles;
 }

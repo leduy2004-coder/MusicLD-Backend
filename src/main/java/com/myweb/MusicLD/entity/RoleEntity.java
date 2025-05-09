@@ -5,6 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
@@ -16,13 +17,14 @@ import java.util.List;
 @Entity
 @Builder
 @Table(name = "role")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleEntity extends BaseEntity{
 
-    private String code;
+    String code;
 
-    private String name;
+    String name;
 
 
     @ManyToMany(mappedBy = "roles",fetch = FetchType.LAZY)
-    private List<UserEntity> users;
+    List<UserEntity> users;
 }

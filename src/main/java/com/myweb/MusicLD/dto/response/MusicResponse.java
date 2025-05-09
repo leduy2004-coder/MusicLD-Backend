@@ -3,6 +3,7 @@ package com.myweb.MusicLD.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myweb.MusicLD.utility.enumUtils.AccessMusic;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 
@@ -12,19 +13,20 @@ import java.math.BigInteger;
 @Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MusicResponse {
-    private BigInteger id;
-    private String publicId;
-    private String url;
-    private String title;
-    private String lyrics;
-    private int duration;
-    private String nickName;
-    private BigInteger idUser;
-    private AccessMusic access;
-    private AvatarResponse avatarResponse;
-    private AvatarResponse userAvatarResponse;
-    private long countLike;
-    private boolean isLike;
-    private boolean status;
+    BigInteger id;
+    String publicId;
+    String url;
+    String title;
+    String lyrics;
+    int duration;
+    String nickName;
+    BigInteger idUser;
+    AccessMusic access;
+    AvatarResponse avatarResponse;
+    AvatarResponse userAvatarResponse;
+    long countLike;
+    boolean isLike;
+    boolean status;
 }

@@ -2,19 +2,18 @@ package com.myweb.MusicLD.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ImageDataDTO {
-    private String name;
-    private String type;
-    private byte[] imageData;
-    private Boolean status;
+    String name;
+    String type;
+    byte[] imageData;
+    Boolean status;
 }

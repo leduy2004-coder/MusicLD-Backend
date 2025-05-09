@@ -4,7 +4,9 @@ import com.myweb.MusicLD.dto.response.ApiResponse;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.service.FollowerService;
 import com.myweb.MusicLD.utility.enumUtils.RequestFollowStatus;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -13,9 +15,10 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/follow")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FollowerController {
 
-    private final FollowerService followerService;
+    FollowerService followerService;
 
 
     @GetMapping("/get-all-follower/{id}")

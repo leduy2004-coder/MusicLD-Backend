@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.myweb.MusicLD.dto.response.UserResponse;
 import com.myweb.MusicLD.utility.enumUtils.TokenType;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 
@@ -13,11 +14,12 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenRequest {
-    private BigInteger id;
-    private String token;
-    private TokenType tokenType;
-    private boolean revoked;
-    private boolean expired;
-    private UserResponse userEntity;
+    BigInteger id;
+    String token;
+    TokenType tokenType;
+    boolean revoked;
+    boolean expired;
+    UserResponse userEntity;
 }
